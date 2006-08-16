@@ -1,0 +1,6 @@
+Revision history for Perl extension Games::Sudoku::SudokuTk.
+
+0.01  Mon Aug 14 20:49:37 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Games::Sudoku::SudokuTk
+
