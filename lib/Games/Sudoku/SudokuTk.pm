@@ -5,7 +5,7 @@ use 5.008007;
 use warnings;
 
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sudoku();
 
@@ -35,20 +35,16 @@ __END__
 
 =head1 NAME
 
-Games::Sudoku::SudokuTk - Perl extension for blah blah blah
+Games::Sudoku::SudokuTk - Perl extension for Sudoku with Tk
 
 =head1 SYNOPSIS
 
   use Games::Sudoku::SudokuTk;
-  blah blah blah
+
 
 =head1 DESCRIPTION
 
-Stub documentation for Games::Sudoku::SudokuTk, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
+Game Sudoku with Tk
 
 =head2 EXPORT
 
