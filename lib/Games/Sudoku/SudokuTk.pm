@@ -5,12 +5,12 @@ use 5.008007;
 use warnings;
 
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sudoku();
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
-
+ 
 
 1;
 
