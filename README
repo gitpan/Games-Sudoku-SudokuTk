@@ -1,4 +1,4 @@
-Games-Sudoku-SudokuTk version 0.01
+Games-Sudoku-SudokuTk version 0.05
 ==================================
 
 The README is used to introduce the module and provide instructions on
@@ -54,5 +54,4 @@ Copyright (C) 2006 by Christian Guine
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.7 or,
 at your option, any later version of Perl 5 you may have available.
-
 

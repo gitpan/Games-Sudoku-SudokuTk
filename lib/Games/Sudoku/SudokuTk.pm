@@ -5,7 +5,7 @@ use 5.008007;
 #use warnings;
 
 
-our $VERSION = '0.04'; 
+our $VERSION = '0.05'; 
 
 sudoku();
 
@@ -30,9 +30,23 @@ $wcanvas = 1;
 MainLoop;
 }
 
+#* Copyright (C) 2006 Christian Guine
+# * This program is free software; you can redistribute it and/or modify it
+# * under the terms of the GNU General Public License as published by the Free
+# * Software Fondation; either version 2 of the License, or (at your option)
+# * any later version.
+# * This program is distributed in the hope that it will be useful, but WITHOUT
+# * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# * more details.
+# * You should have received a copy of the GNU General Public License along with
+# * this program; if not, write to the Free Software Foundation, Inc., 59
+# * Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# */
+# menu.pm  menu management 
 sub menu {
-        #use Games::Sudoku::affichgrille;
-        #use Games::Sudoku::newgrille;
+        use Games::Sudoku::affichgrille;
+        use Games::Sudoku::newgrille;
         my ($origine) = @_;
         #print "menu " . $origine . "\n";
         # definition of menu
@@ -79,7 +93,7 @@ sub menu {
                 # ask for a new grid
                 $optionmenu->command(
                         -label          => tr1('Demander une nouvelle grille'),
-                        -command        => [\&newgrille,"R"],
+                        -command        => [\&affichgrille,"C"],
                         -accelerator    => 'Ctrl+r',
                 );
                 $main->bind('<Control-n>' => [\&affichgrille,"R"]);
@@ -98,11 +112,11 @@ sub menu {
                         # Solution
                         $optionmenu->command(
                                 -label          => tr1('Solution'),
-                                -command        => [\&solution,"S"],
+                                -command        => [\&solutiond,"S"],
                                 -accelerator    => 'Ctrl+s',
                         );
                         my $text3 = tr1('Solution') . 'C+s\n';
-                        $main->bind('Control-s>' => [\&solution,"S"]);
+                        $main->bind('Control-s>' => [\&solutiond,"S"]);
                 }
         }
         # Language Menu
@@ -123,12 +137,31 @@ sub menu {
         $languemenu->radiobutton(-label => tr1('portuguais'),
                 -command => [\&changelang,"pt"]);
 }
+1;
 
-
+#* Copyright (C) 2006 Christian Guine
+# * This program is free software; you can redistribute it and/or modify it
+# * under the terms of the GNU General Public License as published by the Free
+# * Software Fondation; either version 2 of the License, or (at your option)
+# * any later version.
+# * This program is distributed in the hope that it will be useful, but WITHOUT
+# * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# * more details.
+# * You should have received a copy of the GNU General Public License along with
+# * this program; if not, write to the Free Software Foundation, Inc., 59
+# * Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# */
+# affichgrille.pm    Posting of a grid 
+#               fonction = "S" ==> solution
+#               fonction = "R" ==> resolution
+#               fonction = "C" ==> grid creation
+#               fonction = "T" ==> seizure grid
+#               fonction = "V" ==> seizure solution
 sub affichgrille {
         use Tk;
-        #use Games::Sudoku::menu;
-        #use Games::Sudoku::tr1;
+        use Games::Sudoku::menu;
+        use Games::Sudoku::tr1;
         if ($wcanvas == 1) {                    # cancellation image beginning 
                 $canvas -> destroy;
                 $wcanvas = 0;
@@ -159,6 +192,24 @@ sub affichgrille {
                                 -command=>[\&OK1],
                                 -text=>tr1('OK')
                         )->pack();
+        } elsif ($fonction eq "C") {
+                $frame1 = $main->Frame(-width => 750, -height => 500);
+                $frame1->pack(-side=>'left');
+                my $frame2 = $frame1->Frame;            # Posting Question 
+                $frame2->pack;
+                $frame2->Label(-text=>tr1('Quelle difficulté?'),
+                        -font => "Nimbus 15")->pack(-side=>'left');
+                $listdifficulte = $frame2->Listbox(-width => 10, -height => 3)->pack(-side=>'right');
+                $listdifficulte->insert('end',tr1('Facile'),tr1('Difficile'),tr1('Très difficile'));
+                $listdifficulte->activate(0);
+                $listdifficulte->bind('<Double-1>',\&OK2);
+                $main->bind('<Key-Return>', => [\&OK2]);
+                my $frame3 =$frame1->Frame;
+                        $frame3->pack;
+                $frame3 = $frame1->Button (
+                                -command=>[\&OK2],
+                                -text=>tr1('OK')
+                        )->pack();   
         } else {
                 menu('affichgrilleS');
                 $frame1 = $main->Frame(-width => 750, -height => 500);
@@ -191,8 +242,8 @@ sub creation_grille {                   # Posting grid to build a problem
 }
 
 sub OK1 {                       # seizure answer to question new grid yes/no
-        #use Games::Sudoku::sudokuprincipal;
-        #use Games::Sudoku::tr1;
+        use Games::Sudoku::sudokuprincipal;
+        use Games::Sudoku::tr1;
         @precarre = ' ';
         @frame = ' ';
         @frame1 = ' ';
@@ -209,12 +260,33 @@ sub OK1 {                       # seizure answer to question new grid yes/no
                 init_tableau();       
         }
         #print "OK1 " . $option . "\n";
+        $trait = "T";
+        $fin = 0;
         affichage_grille('T');
 }
 
+sub OK2 {                       # seizure answer to question difficult
+        use Games::Sudoku::sudokuprincipal;
+        use Games::Sudoku::tr1;
+        $option = $listdifficulte->get('active');
+        $option =~ s/^\s+//;      # delete spaces beginning and end
+        my $reponse = tr1('Facile');
+        my $reponse1 = tr1('Difficile');
+        my $reponse2 = tr1('Très difficile');
+        if ($option eq $reponse1) {
+                $difficulte = 1;
+        } elsif ($option eq $reponse2) {
+                $difficulte = 2;
+        } else {
+                $difficulte = 0;
+        }
+        newgrille('R');
+}
+
 sub affichage_grille {          # posting grid
-        #use Games::Sudoku::saisie1;
+        use Games::Sudoku::saisie1;
         ($trait) = @_;
+        #print "affichage grille trait= " . $trait . "\n";
         $frame1->destroy;
         $frame1 = $main->Frame(-width => 750, -height => 500);
         $frame1->pack;
@@ -255,6 +327,25 @@ sub affichage_grille {          # posting grid
                                 }
                                 if ($fin == 0) {    # all is not found
                                         if ($trait eq "V") {
+                                                $frame11 = $frame7->Frame;
+                                                $checkaide= $frame7->Checkbutton(-text 
+                                                        => tr1('Aide?'), 
+                                                        -font => "Nimbus 15",
+                                                        -variable => \$aide,
+                                                        -command => \&importations
+                                                        )->pack();
+                                                if ($aide == 1) {
+                                                        $checkaide->select;
+                                                } else {
+                                                        $checkaide->deselect;
+                                                }
+                                                if ($erreur_aide == 1) {
+                                                        $frame12 = $frame7->Label(-text
+                                                        => tr1('Faux la bonne valeur est ') 
+                                                        . $bonnevaleur,
+                                                        -font => "Nimbus 15"
+                                                        )->pack();
+                                                }
                                                 $frame10 = $frame7->Label(-text 
                                                         => tr1('Tout n\'est pas trouvé'),
                                                         -font => "Nimbus 15"
@@ -299,8 +390,10 @@ sub affichage_grille {          # posting grid
                         }
                 }
         }
+        #print "fin affich trait= " . $trait . "\n";
         if ($trait eq "V") {
-                exportation(" ");
+                $traitexport = " ";
+                exportation();
         }
         $main->bind('<Key-Return>', => [\&saisie2]);
                 #}
@@ -358,13 +451,200 @@ sub affich_case {           # posting a box
                         }
                 }
         }
-} 
+}
 
+#* Copyright (C) 2006 Christian Guine
+# * This program is free software; you can redistribute it and/or modify it
+# * under the terms of the GNU General Public License as published by the Free
+# * Software Fondation; either version 2 of the License, or (at your option)
+# * any later version.
+# * This program is distributed in the hope that it will be useful, but WITHOUT
+# * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# * more details.
+# * You should have received a copy of the GNU General Public License along with
+# * this program; if not, write to the Free Software Foundation, Inc., 59
+# * Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# */
+# newgrille.pm design of a new grid
+sub newgrille { 
+        use Games::Sudoku::sudokuprincipal;
+        use Games::Sudoku::affichgrille;
+        if ($wcanvas == 1) {            # delete Label of beginning
+                $canvas -> destroy;
+                $wcanvas = 0;
+                $frame1 = $main->Frame;
+                $frame1->pack;
+        }
+        $trait = "N";
+        BOUCLE:while ($fin == 0) {              # loop as much as a solution was not found 
+                                                # where all is found
+        #print "debut boucle\n";
+        init_tableau();                         # initialization table
+        $fin = 0;
+        $cpt = 0;
+                LOOP:while ($fin == 0 and $cpt < 100) {         # loop for filling the grid
+                        $cpt++;
+                        # random search of a number
+                        $i = int(rand(9));
+                        $j = int(rand(9));
+                        $k = int(rand(9));
+                #print "ligne= " . ($i + 1) . " colonne= " . ($j + 1) . " valeur= " . ($k + 1) 
+                 #       . " cpt= " . $cpt . "\n";
+                        if ($precarre[$i][$j][$k] ne "P") {
+                        #print ("deja pris");
+                                next LOOP;
+                        }
+                        @wprecarre = "";        
+                        # save before checking correct choice
+                        for (my $wi = 0; $wi < 9; $wi++) {                
+                                for (my $wj = 0; $wj < 9; $wj++) {
+                                        for (my $wk = 0; $wk < 9; $wk++) {
+                                                $wprecarre[$wi][$wj][$wk] = $precarre[$wi][$wj][$wk];
+                                        }
+                                }
+                        }
+                        # we cancel the other possibility on line column and area
+                        $precarre[$i][$j][$k] = "S";
+                        $trait = "N";
+                        $ligne = $i;
+                        $colonne = $j;
+                        $valeur = $k;
+                        $entree = "S";
+                        $endroit = "";
+                        modif_tableau();
+                        # it is checked that there is no completely cancelled box
+                        for (my $wi = 0; $wi < 9; $wi++) {                
+                                for (my $wj = 0; $wj < 9; $wj++) {
+                                        $trouve = 0;
+                                        for (my $wk = 0; $wk < 9; $wk++) {
+                                                if ($precarre[$wi][$wj][$wk] ne " ") {
+                                                        $trouve = 1;
+                                                }
+                                        }
+                                        if ($trouve == 0) {     # we have find a box completely cancelled
+                                                                # we backup
+                                                #print "case blanche i= " . $i . " j= " 
+                                                 #      . $j . " k= " . $k . "\n";
+                                                $#precarre = -1;
+                                                for ($wi = 0; $wi < 9; $wi++) {                
+                                                        for ($wj = 0; $wj < 9; $wj++) {
+                                                                for ($wk = 0; $wk < 9; $wk++) {
+                                                                        $precarre[$wi][$wj][$wk] = 
+                                                                            $wprecarre[$wi][$wj][$wk];
+                                                                }
+                                                        }
+                                                }
+                                        exportation();
+                                        #print ("case blanche");
+                                        next LOOP;      #we seek an other number
+                                        }
+                                }
+                        }
+                        $final = 0;
+                        solution();             # we are checking that all is found
+                        $traitexport = "B";
+                        exportationb();
+                }
+                # it is checked that all is filled
+                $fin = 1; 
+                $cpt1 = 0;
+                $#enmoins = -1;
+                for (my $wi = 0; $wi < 9; $wi++) {                
+                        for (my $wj = 0; $wj < 9; $wj++) {
+                                $trouve = 0;
+                                for (my $wk = 0; $wk < 9; $wk++) {
+                                        if ($precarre[$wi][$wj][$wk] ne " " 
+                                                and $precarre[$wi][$wj][$wk] ne "P") {
+                                                $trouve = 1;
+                                                if ($precarre[$wi][$wj][$wk] eq "S") {
+                                                        $cpt1++;      
+                                                }                 
+                                        }
+                                }
+                                if ($trouve == 0) {
+                                        $fin = 0;       # we start again
+                                }
+                        }
+                }
+                #print "fin cpt1= " . $cpt1 . "\n";
+        }
+        $traitexport = "S";
+        exportation();                # save the solution
+        # Preparation grid for posting
+        for (my $wi = 0; $wi < 9; $wi++) {                
+                        for (my $wj = 0; $wj < 9; $wj++) {
+                                $trouve = 0;
+                                # Is it a seizure in the box? 
+                                for (my $wk1 = 0; $wk1 < 9; $wk1++) {
+                                        if ($precarre[$wi][$wj][$wk1] eq "S") {
+                                                $trouve = 1;
+                                                last;
+                                        }
+                                }      
+                                for (my $wk = 0; $wk < 9; $wk++) {
+                                        if ($precarre[$wi][$wj][$wk] ne "S") {
+                                                if ($trouve == 0) { # if we find a seizure
+                                                        $precarre[$wi][$wj][$wk] = "P";
+                                                } else {
+                                                        $precarre[$wi][$wj][$wk] = " ";
+                                                }
+                                        } 
+                                }
+                        }
+        }
+        # Elimination of impossible combinations
+        for (my $wi = 0; $wi < 9; $wi++) {                
+                        for (my $wj = 0; $wj < 9; $wj++) {
+                                $trouve = 0;
+                                for (my $wk = 0; $wk < 9; $wk++) {
+                                        if ($precarre[$wi][$wj][$wk] eq "S") {
+                                                $entree = "S";
+                                                $ligne = $wi;
+                                                $colonne = $wj;
+                                                $valeur = $wk;
+                                                $endroit = "";
+                                                modif_tableau($entree);     
+                                        }
+                                }
+                        }
+        }
+        $fin = 0;
+        $traitexport = " ";
+        exportation();
+        $traitexport = "S";
+        exportation();
+        retour_arriere();
+        $traitexport = " ";
+        exportation();
+        affichage_grille('V');
+}
+1;
+
+#* Copyright (C) 2006 Christian Guine
+# * This program is free software; you can redistribute it and/or modify it
+# * under the terms of the GNU General Public License as published by the Free
+# * Software Fondation; either version 2 of the License, or (at your option)
+# * any later version.
+# * This program is distributed in the hope that it will be useful, but WITHOUT
+# * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# * more details.
+# * You should have received a copy of the GNU General Public License along with
+# * this program; if not, write to the Free Software Foundation, Inc., 59
+# * Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# */
+# saisie1.pm treatement of seized modifications
+#               function = "S" ==> solution
+#               function = "R" ==> résolution
+#               function = "C" ==> grid creation
+#               function = "T" ==> seizure of  grid
+#               function = "V" ==> seizure of solution
 sub saisie1 {
-        #use Games::Sudoku::sudokuprincipal;
+        use Games::Sudoku::sudokuprincipal;
         #print "saisie1 trait= " . $trait . "\n";
         $erreur_saisie = 0;
-        @wprecarre = "";
+        $#wprecarre = -1;
         # Save of context
         for ($i = 0; $i < 9; $i++) {                
                 for ($j = 0; $j < 9; $j++) {
@@ -395,7 +675,23 @@ sub saisie1 {
                                         #print " g " . $valeurw;
                                         if ($valeurw > 0 and $valeurw < 10) {      # There is a seizure 
                                                 #print "valeur " . $valeurw . "\n";
-                                                if ($precarre[$i][$j][$valeurw - 1] ne "P") {
+                                                $erreur_aide = 0;
+                                                if ($aide == 1) {
+                                                        if ($precarres[$i][$j][$valeurw - 1] ne "C") {
+                                                                $erreur_aide = 1;
+                                                                for (my $k1 = 0; $k1 < 9; $k1++) {
+                                                                if ($precarres[$i][$j][$k1] ne " " and
+                                                                        $precarres[$i][$j][$k1] ne "P") 
+                                                                        {
+                                                                        $bonnevaleur = $k1 + 1;
+                                                                        #print "valeur " . $bonnevaleur;
+                                                                        last;
+                                                                }
+                                                                }
+                                                        }
+                                                }
+                                                if (($precarre[$i][$j][$valeurw - 1] ne "P")
+                                                        or $erreur_aide == 1) {
                                                         $erreur_saisie = 1;
                                                 } else {
                                                         if ($trait eq "V") {     # we are seizing
@@ -454,13 +750,34 @@ sub saisie1 {
                 #verif_fin();
                 affichage_grille('V');
         } else {
-                solution(); 
+                solution();
         }
 }
+1;
+
+#* Copyright (C) 2006 Christian Guine
+# * This program is free software; you can redistribute it and/or modify it
+# * under the terms of the GNU General Public License as published by the Free
+# * Software Fondation; either version 2 of the License, or (at your option)
+# * any later version.
+# * This program is distributed in the hope that it will be useful, but WITHOUT
+# * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# * more details.
+# * You should have received a copy of the GNU General Public License along with
+# * this program; if not, write to the Free Software Foundation, Inc., 59
+# * Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# */
+# sudokuprincipal.pm 
+# to resolve Sudoku in few seconds
+sub sudokuprincipal {
+
+}
+1;
 
 sub traitement {                    # treatment of seizure   
 solution();
-exportation(" ");
+exportation();
 verif_seul();                       # we indicate if a number remains alone after calculation
 $final = 0;
 while ($final == 0) {
@@ -477,12 +794,21 @@ affichage_grille('F');
 }
 
 sub fin_saisie {
+        $traitexport = " ";
+        exportation();
+        $trait = "N";
+        solution();
+        $traitexport = "S";
+        exportation();
         $trait = "V";
+        $fin = 0;
+        $traitexport = " ";
+        importation();
         saisie1();
 }
 
 sub saisie2 {
-        #print "saisie2" . $trait . "\n";
+        #print "saisie2 trait= " . $trait . "\n";
         $erreur_saisie = 0;
         if ($trait eq "V") {
                 fin_saisie();
@@ -501,9 +827,17 @@ sub verif {
         }                       
 }
 
+sub solutiond {
+        $trait = "S";
+        solution();
+}
+
 sub solution {                              # Posting solution
         if ($trait eq "V") {
                 importation('W');           # backup of initial grid
+        }
+        if ($trait eq "S") {
+                importation('S');
         }
         verif_seul();                       # we indicate if a number is alone
         $final = 0;
@@ -723,15 +1057,35 @@ sub modif_tableau                       # If a number is found we cancel the pos
         }
 }
 
+sub importations
+{
+        use IO::File;
+        $filehandle = new IO::File;
+        my $retour = $filehandle->open("< sudokus.txt") 
+                or die "impossible ouvrir sudokus importations";  
+        $#precarres = -1;
+        for (my $i = 0; $i < 9; $i++) {
+                for (my $j = 0; $j < 9; $j++) {
+                        for (my $k = 0; $k < 9; $k++) {
+                                $filehandle->read($newtext,1);
+                                $val = $k + 1;
+                                $carre[$i][$j][$k] = $val;
+                                $precarres[$i][$j][$k] = $newtext;
+                        }
+                }
+        }
+        $filehandle->close;       
+}
+
 sub importation                 #importation data from a file
 {         
         use IO::File;
         #use File::Copy;
-        @precarre = ' ';
-        my ($trait) = @_;
-        
+        $#precarre = -1;
+        my ($traitexport) = @_;
+        #print "importation " . $traitexport . "\n";
         $filehandle = new IO::File;
-        if ($trait eq "W") {                   
+        if ($traitexport eq "W") {                   
                 my $retour = $filehandle->open("< sudokuw.txt");
                 if ($retour != 1) {
                         $filesortie = new IO::File;
@@ -741,6 +1095,8 @@ sub importation                 #importation data from a file
                 }
                 $filehandle->close;
                 $filehandle->open("< sudokuw.txt") or die "impossible d'ouvrir fichier sudokuw";  
+        } elsif ($traitexport eq "S") {
+                 my $retour = $filehandle->open("< sudokus.txt") or die "impossible ouvrir sudokus";     
         } else {
                 my $retour = $filehandle->open("< sudoku.txt");
                 if ($retour != 1) {
@@ -753,7 +1109,7 @@ sub importation                 #importation data from a file
                 $filehandle->open("< sudoku.txt") or die "impossible d'ouvrir fichier";
         }
         @carre = 0;
-        @precarre = ' ';
+        $#precarre = -1;
         for ($i = 0; $i < 9; $i++) {
                 for ($j = 0; $j < 9; $j++) {
                         for ($k = 0; $k < 9; $k++) {
@@ -769,30 +1125,116 @@ sub importation                 #importation data from a file
 
 sub sauve
 {
-        exportation(" ");
+        $traitexport = " ";
+        exportation();
 }
 
-sub exportation
-{
+sub exportation {
         use IO::File;
         #use File::Copy;
-        my ($trait) = @_;
+        #$trait = @_;
+        #print "exportation trait " . $traitexport . " cpt1= " . $cpt1 . "\n";
         $filesortie = new IO::File;
-        if ($trait eq "W") {                
+        if ($traitexport eq "W") {                
                 $filesortie->open("> sudokuw.txt") or die "impossible ouvrir sortie sudokuw";
+        } elsif ($traitexport eq "S") {
+                        $filesortie->open("> sudokus.txt") or die "impossible ouvrir sortie sudokus";
         } else {
                 my $retour = $filesortie->open("> sudoku.txt");
                 $filesortie->open("> sudoku.txt") or die "impossible ouvrir sortie ";
         }
+        if ($traitexport eq "S") {
+                $#enmoins = -1;                #init table
+                if ($difficulte != 0) {
+                        if ($difficulte >= 1) {
+                                push (@enmoins, (int(rand ($cpt1) + 1)));
+                        } 
+                        if ($difficulte == 2) {
+                                push (@enmoins, (int(rand ($cpt1) + 1)));
+                        }
+                }
+                #print "enmoins ";
+                #for $wi (0 .. $#enmoins) {
+                 #       print " " . $enmoins[$wi];
+                #}
+                #print "\n";
+        }
+        $cpt2 = 0;
         for ($i = 0; $i < 9; $i++) {
                 for ($j = 0; $j < 9; $j++) {
                         for ($k = 0; $k < 9; $k++) {
                                 $text = $precarre[$i][$j][$k];
                                 $filesortie->write($text, 1);
+                                #if ($traitexport eq "S" and $enleve == 1
+                                 #       and $precarre[$i][$j][$k] eq "S") {        
+                                  #      $cpt2++;
+                                   #     for $wi (0 .. $#enmoins) {
+                                                #print $wi . " " . $cpt2 . "\n";
+                                    #            if ($cpt2 eq $enmoins[$wi]) {
+                                     #                   if ($traitexport eq "W") {
+                                      #                          $precarre[$i][$j][$k] = "P";
+                                       #                 } elsif ($traitexport eq "S") {
+                                        #                        $precarre[$i][$j][$k] = "P";
+                                         #                       retour_arriere();
+                                          #              }
+                                           #             print "enleve " . $cpt2 . " i= " . ($i + 1) 
+                                            #              . " j= " . ($j + 1) . " k= " 
+                                             #             . ($k + 1) . "\n";
+                                              #  }
+                                        #}
+                                #}
                         }
                 }
         }
-        $filesortie->close;             
+        $filesortie->close; 
+        #$enleve = 0;            
+}
+
+sub exportationb {
+        use IO::File;
+        $filesortie = new IO::File;
+        $filesortie->open("> sudoku3.txt") or die "impossible ouvrir sortie sudoku3";
+        $filehandle = new IO::File;                
+        my $retour = $filehandle->open("< sudoku2.txt");
+        if ($retour == 1) {
+                for (my $is = 0; $is < 9; $is++) {
+                        for (my $js = 0; $js < 9; $js++) {
+                                for (my $ks = 0; $ks < 9; $ks++) {
+                                        $filehandle->read($text,1);
+                                        $filesortie->write($text, 1);      
+                                }
+                        }
+                }
+                $filehandle->close;
+        }
+        $filesortie->close;
+        $filesortie = new IO::File;
+        $filesortie->open("> sudoku2.txt") or die "impossible ouvrir sortie sudoku2";
+        $filehandle = new IO::File;                
+        my $retour = $filehandle->open("< sudoku1.txt");
+        if ($retour == 1) {
+                for (my $is = 0; $is < 9; $is++) {
+                        for (my $js = 0; $js < 9; $js++) {
+                                for (my $ks = 0; $ks < 9; $ks++) {
+                                        $filehandle->read($text,1);
+                                        $filesortie->write($text, 1);      
+                                }
+                        }
+                }
+                $filehandle->close;
+        }
+        $filesortie->close;
+        $filesortie = new IO::File;
+        $filesortie->open("> sudoku1.txt") or die "impossible ouvrir sortie sudoku2";
+        for (my $is = 0; $is < 9; $is++) {
+                for (my $js = 0; $js < 9; $js++) {
+                        for (my $ks = 0; $ks < 9; $ks++) {
+                                $text = $precarre[$is][$js][$ks];
+                                $filesortie->write($text, 1);      
+                        }
+                }
+        }
+        $filesortie->close;                           
 }
 
 sub init_tableau {
@@ -806,147 +1248,48 @@ sub init_tableau {
                         }
                 }
         }
-} 
-
-sub newgrille { 
-        #use Games::Sudoku::sudokuprincipal;
-        #use Games::Sudoku::affichgrille;
-        if ($wcanvas == 1) {            # delete Label of beginning
-                $canvas -> destroy; 
-                $wcanvas = 0;
-                $frame1 = $main->Frame;
-                $frame1->pack;
-        }
-        BOUCLE:while ($fin == 0) {              # loop as much as a solution was not found 
-                                                # where all is found
-        #print "debut boucle\n";
-        init_tableau();                         # initialization table
-        $fin = 0;
-        $cpt = 0;
-                LOOP:while ($fin == 0 and $cpt < 100) {         # loop for filling the grid
-                        $cpt++;
-                        # random search of a number
-                        $i = int(rand(9));
-                        $j = int(rand(9));
-                        $k = int(rand(9));
-                #print "ligne= " . ($i + 1) . " colonne= " . ($j + 1) . " valeur= " . ($k + 1) . "\n";
-                        if ($precarre[$i][$j][$k] ne "P") {
-                        #print ("deja pris");
-                                next LOOP;
-                        }
-                        @wprecarre = "";        
-                        # save before checking correct choice
-                        for (my $wi = 0; $wi < 9; $wi++) {                
-                                for (my $wj = 0; $wj < 9; $wj++) {
-                                        for (my $wk = 0; $wk < 9; $wk++) {
-                                                $wprecarre[$wi][$wj][$wk] = $precarre[$wi][$wj][$wk];
-                                        }
-                                }
-                        }
-                        # we cancel the other possibility on line column and area
-                        $precarre[$i][$j][$k] = "S";
-                        $trait = "N";
-                        $ligne = $i;
-                        $colonne = $j;
-                        $valeur = $k;
-                        $entree = "S";
-                        $endroit = "";
-                        modif_tableau();
-                        # it is checked that there is no completely cancelled box
-                        for (my $wi = 0; $wi < 9; $wi++) {                
-                                for (my $wj = 0; $wj < 9; $wj++) {
-                                        $trouve = 0;
-                                        for (my $wk = 0; $wk < 9; $wk++) {
-                                                if ($precarre[$wi][$wj][$wk] ne " ") {
-                                                        $trouve = 1;
-                                                }
-                                        }
-                                        if ($trouve == 0) {     # we have find a box completely cancelled
-                                                                # we backup
-                                                #print "case blanche i= " . $i . " j= " 
-                                                #       . $j . " k= " . $k . "\n";
-                                                @precarre = "";
-                                                for ($wi = 0; $wi < 9; $wi++) {                
-                                                        for ($wj = 0; $wj < 9; $wj++) {
-                                                                for ($wk = 0; $wk < 9; $wk++) {
-                                                                        $precarre[$wi][$wj][$wk] = 
-                                                                            $wprecarre[$wi][$wj][$wk];
-                                                                }
-                                                        }
-                                                }
-                                        exportation(" ");
-                                        #print ("case blanche");
-                                        next LOOP;      #we seek an other number
-                                        }
-                                }
-                        }
-                        $final = 0;
-                        solution();             # we are checking that all is found
-                }
-                # it is checked that all is filled
-                $fin = 1; 
-                for (my $wi = 0; $wi < 9; $wi++) {                
-                        for (my $wj = 0; $wj < 9; $wj++) {
-                                $trouve = 0;
-                                for (my $wk = 0; $wk < 9; $wk++) {
-                                        if ($precarre[$wi][$wj][$wk] ne " " 
-                                                and $precarre[$wi][$wj][$wk] ne "P") {
-                                                $trouve = 1;
-                                        }
-                                }
-                                if ($trouve == 0) {
-                                        $fin = 0;       # we start again
-                                }
-                        }
-                }
-                #print "fin\n";
-        }
-        # Preparation grid for posting
-        for (my $wi = 0; $wi < 9; $wi++) {                
-                        for (my $wj = 0; $wj < 9; $wj++) {
-                                $trouve = 0;
-                                # Is it a seizure in the box? 
-                                for (my $wk1 = 0; $wk1 < 9; $wk1++) {
-                                        if ($precarre[$wi][$wj][$wk1] eq "S") {
-                                                $trouve = 1;
-                                                last;
-                                        }
-                                }      
-                                for (my $wk = 0; $wk < 9; $wk++) {
-                                        if ($precarre[$wi][$wj][$wk] ne "S") {
-                                                if ($trouve == 0) { # if we find a seizure
-                                                        $precarre[$wi][$wj][$wk] = "P";
-                                                } else {
-                                                        $precarre[$wi][$wj][$wk] = " ";
-                                                }
-                                        } 
-                                }
-                        }
-        }
-        # Elimination of impossible combinations
-        for (my $wi = 0; $wi < 9; $wi++) {                
-                        for (my $wj = 0; $wj < 9; $wj++) {
-                                $trouve = 0;
-                                for (my $wk = 0; $wk < 9; $wk++) {
-                                        if ($precarre[$wi][$wj][$wk] eq "S") {
-                                                $entree = "S";
-                                                $ligne = $wi;
-                                                $colonne = $wj;
-                                                $valeur = $wk;
-                                                $endroit = "";
-                                                modif_tableau($entree);     
-                                        }
-                                }
-                        }
-        }
-        $fin = 0;
-        exportation(" ");
-        exportation('W');
-        affichage_grille('V');
 }
+ 
+sub retour_arriere {
+        use IO::File;
+        $filehandle = new IO::File;
+        if ($difficulte != 0) {
+                if ($difficulte == 1) {
+                        $filehandle->open("< sudoku2.txt") 
+                                or die "impossible ouvrir sortie sudoku1";
+                } elsif ($difficulte == 2) {
+                        $filehandle->open("< sudoku3.txt") 
+                                or die "impossible ouvrir sortie sudoku2";
+                }
+                for (my $is = 0; $is < 9; $is++) {                
+                        for (my $js = 0; $js < 9; $js++) {        
+                                for (my $ks = 0; $ks < 9; $ks++) { 
+                                $filehandle->read($text,1);
+                                $precarre[$i][$j][$k] = $text;
+                                }
+                        }
+                }
+        }
+        $filehandle->close;               
+}               
 
+
+#* Copyright (C) 2006 Christian Guine
+# * This program is free software; you can redistribute it and/or modify it
+# * under the terms of the GNU General Public License as published by the Free
+# * Software Fondation; either version 2 of the License, or (at your option)
+# * any later version.
+# * This program is distributed in the hope that it will be useful, but WITHOUT
+# * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# * more details.
+# * You should have received a copy of the GNU General Public License along with
+# * this program; if not, write to the Free Software Foundation, Inc., 59
+# * Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# */
+# file of configuration tr1.pm
 sub tr1 {
-        use IO::File; 
+        use IO::File;
         if ($langue eq "") {
                 # reading language in file conf.txt
                 $filehandle = new IO::File; 
@@ -1011,6 +1354,11 @@ sub traduction {                # translation
                 "en", "anglais", "english",
                 "en", "allemand", "german",
                 "en", "espagnol", "spanish",
+                "en", "Quelle difficulté?", "Wich difficulty?",
+                "en", "Facile", "Easy",
+                "en", "Difficile", "Difficult",
+                "en", "Très difficile", "Very difficult",
+                "en", "Aide?","Help?",
                 "ge", "OUI", "YA",
                 "ge", "NON", "NEIN",
                 "ge", "FIN SAISIE", "ERFASSUNGSENDE",
@@ -1036,6 +1384,11 @@ sub traduction {                # translation
                 "ge", "anglais", "Engländer",
                 "ge", "allemand", "deutsch",
                 "ge", "espagnol", "spanish",
+                "ge", "Quelle difficulté?", "Welche Schwierigkeit",
+                "ge", "Facile", "Einfach",
+                "ge", "Difficile", "Schwierig",
+                "ge", "Très difficile", "Sehr schwierig",
+                "ge", "Aide?","Helfen?",
                 "sp", "OUI", "SI",
                 "sp", "NON", "NO",
                 "sp", "FIN SAISIE", "FINAL DE INTRODUCCION",
@@ -1061,6 +1414,11 @@ sub traduction {                # translation
                 "sp", "anglais", "Inglés",
                 "sp", "allemand", "alemãn",
                 "sp", "espagnol", "español",
+                "sp", "Quelle difficulté?", "?Qué dificultad",
+                "sp", "Facile", "facil",
+                "sp", "Difficile", "dificil",
+                "sp", "Très difficile", "muy dificil",
+                "sp", "Aide?","?ayuda",
                 "it", "OUI", "SI",
                 "it", "NON", "NO",
                 "it", "FIN SAISIE", "FINE DI BATTITURA",
@@ -1086,6 +1444,11 @@ sub traduction {                # translation
                 "it", "anglais", "inglese",
                 "it", "allemand", "tedesco",
                 "it", "espagnol", "spagnolo",
+                "it", "Quelle difficulté?", "Quale difficoltà?",
+                "it", "Facile", "Facile",
+                "it", "Difficile", "Difficile",
+                "it", "Très difficile", "Molto difficile",
+                "it", "Aide?","Aiuto?",
                 "pt", "OUI", "SIM",
                 "pt", "NON", "NAO",
                 "pt", "FIN SAISIE", "FIM DE APREENSAO",
@@ -1110,7 +1473,12 @@ sub traduction {                # translation
                 "pt", "français", "francês",
                 "pt", "anglais", "inglês",
                 "pt", "allemand", "alemão",
-                "pt", "espagnol", "espanhol" 
+                "pt", "espagnol", "espanhol",
+                "pt", "Quelle difficulté?", "qual dificulda",
+                "pt", "Facile", "facil",
+                "pt", "Difficile", "dificil",
+                "pt", "Très difficile", "muito dificil",
+                "pt", "Aide?","ayuda?"
                 );
         my ($langue,$nomfr) = @_;
         #print $langue . " " . $nomfr;
@@ -1127,7 +1495,7 @@ sub traduction {                # translation
         #print $nomtr . "\n";
         return($nomtr);
 }
-        
+               
         
 
 __END__
