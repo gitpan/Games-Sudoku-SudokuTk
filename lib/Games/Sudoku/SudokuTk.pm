@@ -5,7 +5,7 @@ use 5.008007;
 #use warnings;
 
 
-our $VERSION = '0.05'; 
+our $VERSION = '0.06'; 
 
 sudoku();
 
@@ -45,8 +45,8 @@ MainLoop;
 # */
 # menu.pm  menu management 
 sub menu {
-        use Games::Sudoku::affichgrille;
-        use Games::Sudoku::newgrille;
+        #use Games::Sudoku::affichgrille;
+        #use Games::Sudoku::newgrille;
         my ($origine) = @_;
         #print "menu " . $origine . "\n";
         # definition of menu
@@ -160,8 +160,8 @@ sub menu {
 #               fonction = "V" ==> seizure solution
 sub affichgrille {
         use Tk;
-        use Games::Sudoku::menu;
-        use Games::Sudoku::tr1;
+        #use Games::Sudoku::menu;
+        #use Games::Sudoku::tr1;
         if ($wcanvas == 1) {                    # cancellation image beginning 
                 $canvas -> destroy;
                 $wcanvas = 0;
@@ -242,8 +242,8 @@ sub creation_grille {                   # Posting grid to build a problem
 }
 
 sub OK1 {                       # seizure answer to question new grid yes/no
-        use Games::Sudoku::sudokuprincipal;
-        use Games::Sudoku::tr1;
+        #use Games::Sudoku::sudokuprincipal;
+        #use Games::Sudoku::tr1;
         @precarre = ' ';
         @frame = ' ';
         @frame1 = ' ';
@@ -266,8 +266,8 @@ sub OK1 {                       # seizure answer to question new grid yes/no
 }
 
 sub OK2 {                       # seizure answer to question difficult
-        use Games::Sudoku::sudokuprincipal;
-        use Games::Sudoku::tr1;
+        #use Games::Sudoku::sudokuprincipal;
+        #use Games::Sudoku::tr1;
         $option = $listdifficulte->get('active');
         $option =~ s/^\s+//;      # delete spaces beginning and end
         my $reponse = tr1('Facile');
@@ -284,7 +284,7 @@ sub OK2 {                       # seizure answer to question difficult
 }
 
 sub affichage_grille {          # posting grid
-        use Games::Sudoku::saisie1;
+        #use Games::Sudoku::saisie1;
         ($trait) = @_;
         #print "affichage grille trait= " . $trait . "\n";
         $frame1->destroy;
@@ -468,8 +468,8 @@ sub affich_case {           # posting a box
 # */
 # newgrille.pm design of a new grid
 sub newgrille { 
-        use Games::Sudoku::sudokuprincipal;
-        use Games::Sudoku::affichgrille;
+        #use Games::Sudoku::sudokuprincipal;
+        #use Games::Sudoku::affichgrille;
         if ($wcanvas == 1) {            # delete Label of beginning
                 $canvas -> destroy;
                 $wcanvas = 0;
@@ -641,7 +641,7 @@ sub newgrille {
 #               function = "T" ==> seizure of  grid
 #               function = "V" ==> seizure of solution
 sub saisie1 {
-        use Games::Sudoku::sudokuprincipal;
+        #use Games::Sudoku::sudokuprincipal;
         #print "saisie1 trait= " . $trait . "\n";
         $erreur_saisie = 0;
         $#wprecarre = -1;

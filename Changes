@@ -8,3 +8,5 @@ Revision history for Perl extension Games::Sudoku::SudokuTk.
 0.05 Mon Sept 11 23:00 2006
         - show the solution 
         - help for solution
+0.05 Thu Sept 28 22:00 2006
+	- Correction of bugs
