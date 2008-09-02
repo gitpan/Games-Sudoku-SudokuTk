@@ -1,12 +1,11 @@
 Revision history for Perl extension Games::Sudoku::SudokuTk.
 
-0.01  Mon Aug 14 20:49:37 2006
+0.01  2006
 	- original version; created by h2xs 1.23 with options
-		-X -n Games::Sudoku::SudokuTk
-0.02 Wed Aug 16 20:52 2006
-	- modification of documentation
-0.05 Mon Sept 11 23:00 2006
-        - show the solution 
-        - help for solution
-0.05 Thu Sept 28 22:00 2006
-	- Correction of bugs
+		-A -X -n Games::Sudoku::SudokuTk
+                
+0.02  Fri Aug 29 22:42:23 2006
+        - version with child and Maxi grid
+                - translation in english, german, spanish, italian, portugais
+
+        
