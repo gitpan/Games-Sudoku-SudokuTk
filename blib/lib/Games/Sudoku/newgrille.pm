@@ -25,6 +25,7 @@ sub newgrille {
         }
         $trait = "N";
         $oldwcpt = 0;
+        $fin = 0;
         $force = 0;
         BOUCLE:while ($fin == 0 and $force == 0) {   # loop as much as a solution was not found 
                                                 # where all is found

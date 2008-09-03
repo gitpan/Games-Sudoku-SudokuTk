@@ -219,8 +219,7 @@ TO_INST_PM = lib/Games/Sudoku/SudokuTk.pm \
 	lib/Games/Sudoku/sav/sudokus16.sav6 \
 	lib/Games/Sudoku/sav/sudokus16.sav7 \
 	lib/Games/Sudoku/sudokuprincipal.pm \
-	lib/Games/Sudoku/tr1.pm \
-	sudoku.pl
+	lib/Games/Sudoku/tr1.pm
 
 PM_TO_BLIB = lib/Games/Sudoku/sav/sudokus16.sav0 \
 	blib/lib/Games/Sudoku/sav/sudokus16.sav0 \
@@ -258,8 +257,6 @@ PM_TO_BLIB = lib/Games/Sudoku/sav/sudokus16.sav0 \
 	blib/lib/Games/Sudoku/sav/sudoku16.sav7 \
 	lib/Games/Sudoku/sav/sudoku16.sav1 \
 	blib/lib/Games/Sudoku/sav/sudoku16.sav1 \
-	sudoku.pl \
-	$(INST_LIB)/Games/Sudoku/sudoku.pl \
 	lib/Games/Sudoku/sav/sudoku16.sav2 \
 	blib/lib/Games/Sudoku/sav/sudoku16.sav2 \
 	lib/Games/Sudoku/photos/6.gif \
@@ -930,7 +927,6 @@ pm_to_blib : $(TO_INST_PM)
 	  lib/Games/Sudoku/photos/16b.gif blib/lib/Games/Sudoku/photos/16b.gif \
 	  lib/Games/Sudoku/sav/sudoku16.sav7 blib/lib/Games/Sudoku/sav/sudoku16.sav7 \
 	  lib/Games/Sudoku/sav/sudoku16.sav1 blib/lib/Games/Sudoku/sav/sudoku16.sav1 \
-	  sudoku.pl $(INST_LIB)/Games/Sudoku/sudoku.pl \
 	  lib/Games/Sudoku/sav/sudoku16.sav2 blib/lib/Games/Sudoku/sav/sudoku16.sav2 \
 	  lib/Games/Sudoku/photos/6.gif blib/lib/Games/Sudoku/photos/6.gif \
 	  lib/Games/Sudoku/photos/4.gif blib/lib/Games/Sudoku/photos/4.gif \
