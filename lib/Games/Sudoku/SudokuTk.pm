@@ -25,7 +25,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 sudoku();
 # Preloaded methods go here.
 
