@@ -366,7 +366,7 @@ sub importation                 #importation data from a file
         } else {
                 $pref1 = "";
         }
-        print "importation " . $traitexport . " extension " . $extension . "\n";
+        #print "importation " . $traitexport . " extension " . $extension . "\n";
         $filehandle = new IO::File; 
         my $fic = $pref1 . "sudoku" . $nbcase . "." . $extension;
         my $fics = $pref1 . "sudokus" . $nbcase . "." . $extension;
@@ -461,6 +461,7 @@ sub retour_arriere {
                                 #edit();
                                 $cpt++;
                         }
+
         }
 } 
 
@@ -520,7 +521,7 @@ sub calminmax {
         my $wimin = 0;
         my $wjmax = 0;
         my $wjmin = 0;
-        if ($nbcase == 4) {
+        if ($nbcase == 4) {                     # Enfant
                 if ($ligne < 2) {
                         $wimax = 2;
                         $wimin = 0;
@@ -536,7 +537,48 @@ sub calminmax {
                         $wjmin = 2;
                 }
         }
-        if ($nbcase == 9) {
+        if ($nbcase == 6) {                     # Simpliste
+                if ($ligne < 2) {
+                        $wimax = 2;
+                        $wimin = 0;
+                } elsif ($ligne < 4) {
+                        $wimax = 4;
+                        $wimin = 2;
+                } else {
+                        $wimax = 6;
+                        $wimin = 4;
+                }
+                if ($colonne < 3) {
+                        $wjmax = 3;
+                        $wjmin = 0;
+                } else {
+                        $wjmax = 6;
+                        $wjmin = 3;
+                }
+        }
+        if ($nbcase == 8) {                     # Ardu
+                if ($ligne < 2) {
+                        $wimax = 2;
+                        $wimin = 0;
+                } elsif ($ligne < 4) {
+                        $wimax = 4;
+                        $wimin = 2;
+                } elsif ($ligne < 6) {
+                        $wimax = 6;
+                        $wimin = 4;
+                } else {
+                        $wimax = 8;
+                        $wimin = 6;
+                }
+                if ($colonne < 4) {
+                        $wjmax = 4;
+                        $wjmin = 0;
+                } else {
+                        $wjmax = 8;
+                        $wjmin = 4;
+                }
+        }
+        if ($nbcase == 9) {                     # Normal
                 if ($ligne < 3) {
                         $wimax = 3;
                         $wimin = 0;
@@ -558,7 +600,7 @@ sub calminmax {
                         $wjmin = 6;
                 }
         }
-        if ($nbcase == 16) {
+        if ($nbcase == 16) {                    # Maxi
                 if ($ligne < 4) {
                         $wimax = 4;
                         $wimin = 0;
@@ -587,4 +629,58 @@ sub calminmax {
                 }
         }
         return($wimin, $wimax, $wjmin, $wjmax);
-}              
+} 
+
+sub calminmaxred {
+        my ($nbcase, $code) = @_;
+        # Enfant -- --  Simpliste --- --- Ardu ---- ---- Normal --- --- --- Maxi ---- ---- ---- ---- 
+        #        -- --            --- ---      ---- ----        --- --- ---      ---- ---- ---- ----
+        #                                                       --- --- ---      ---- ---- ---- ----
+        #                         --- ---      ---- ----                         ---- ---- ---- ----
+        #                         --- ---      ---- ----        --- --- ---
+        #                                                       --- --- ---      ---- ---- ---- ----
+        #                         --- ---      ---- ----        --- --- ---      ---- ---- ---- ----
+        #                         --- ---      ---- ----                         ---- ---- ---- ---- 
+        #                                                       --- --- ---      ---- ---- ---- ----
+        #                                      ---- ----        --- --- ---
+        #                                      ---- ----        --- --- ---      ---- ---- ---- ----
+        #                                                                        ---- ---- ---- ----
+        #                                                                        ---- ---- ---- ----
+        #                                                                        ---- ---- ---- ----
+        #
+        #                                                                        ---- ---- ---- ----
+        #                                                                        ---- ---- ---- ----
+        #                                                                        ---- ---- ---- ----
+        #                                                                        ---- ---- ---- ----
+        my $wimax = 0;                  
+        my $wjmax = 0;                  
+        my $wimax1 = O;                 
+        my $wjmax1 = 0;
+        if ($nbcase == 4) {             # Enfant
+                $wimax = 2;                     # number area vertical
+                $wjmax = 2;                     # number area horizontal
+                $wimax1 = 2;                    # number of vertical figures (lines) in an area
+                $wjmax1 = 2;                    # number of horizontal figures (columns) in an area
+        } elsif ($nbcase == 6) {        # Simpliste
+                $wimax = 3;
+                $wjmax = 2;
+                $wimax1 = 2;
+                $wjmax1 = 3;
+        } elsif ($nbcase == 8) {        # Ardu
+                $wimax = 4;
+                $wjmax = 2;
+                $wimax1 = 2;
+                $wjmax1 = 4;
+        } elsif ($nbcase == 16) {       # Maxi
+                $wimax = 4;
+                $wjmax = 4;
+                $wimax1 = 4;
+                $wjmax1 = 4;
+        } else {                        # Normal
+                $wimax = 3;
+                $wjmax = 3;
+                $wimax1 = 3;
+                $wjmax1 = 3;
+        }
+        return ($wimax, $wjmax, $wimax1, $wjmax1);
+}             

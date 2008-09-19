@@ -25,7 +25,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 sudoku();
 # Preloaded methods go here.
 
@@ -33,9 +33,12 @@ sudoku();
 
 sub sudoku {
 use Tk;
+use Tk::Balloon;
 use Games::Sudoku::menu;
-#use Games::Sudoku::conf;
-#conf();
+use Games::Sudoku::affichgrille;
+use Games::Sudoku::tr1;
+use Games::Sudoku::conf;
+conf();
 foreach $a (@INC) {             # we verifie that drawings are here
         $retour = opendir('DIRECTORY',$a . '/Games/Sudoku/photos');
         $b = $a;
@@ -56,40 +59,257 @@ $dessin = "chiffres";
 $MaxiSudoku = 0;             # 0 non choisi 1 choisi 2 autre choisi
 $Normal = 0;                 # idem
 $Enfant = 0;                 # idem
+$Simpliste = 0;              # idem
+$Ardu = 0;                   # idem
 $trait = "sudoku";
 $main = MainWindow->new();
 menu($trait);
-$canvas = $main->Label(-text => 'Sudoku',
-        -height => 4, -width => 10,
-        -font => "Nimbus 80")->pack;
-$framed = $main->Frame->pack();
-$canvas1 = $framed->Canvas('-width' => 100,
-        -height => 100);
-$framed->Photo('image1', -file => $pref . '/photos/20.gif');
-$canvas1->createImage(0, 0, -anchor => 'nw',
-        -image => image1);
-$canvas1->pack;
-$rbutton1= $framed->Radiobutton(-text 
-                        => tr1('Normal'), 
-                        -font => "Nimbus 30",
-                        -value => 1,         # valeur transmise de la variable
-                        -command => [\&Normal],
-                        -variable => \$Normal
-                        )->pack(-side => 'left');
-$rbutton2= $framed->Radiobutton(-text 
-                        => tr1('MaxiSudoku'), 
-                        -font => "Nimbus 30",
-                        -value => 1,
-                        -command => [\&MaxiSudoku],
-                        -variable => \$MaxiSudoku
-                        )->pack(-side => 'left');
-$rbutton3= $framed->Radiobutton(-text 
-                        => tr1('Enfant'), 
-                        -font => "Nimbus 30",
-                        -value => 1,
-                        -command => [\&Enfant],
-                        -variable => \$Enfant
-                        )->pack(-side => 'left');
+if ($skin == 1) {
+# ---------------------------------------------------------
+# frame1                            |frame3 frame31       |
+# frame2                            |----------------------
+# frame4                            |frame32   |34frame35 |
+#                                   |frame33   | |        |
+#                                   |          | |        |
+#                                   |          | |        |
+#                                   |          | |        |
+#-----------------------------------|          | |        | 
+# frame5                            |          | |        |
+#-----------------------------------|          | |        |
+# frame6 frame7  |frame8            |          | |        |
+#-----------------------------------|----------------------
+# frame9                            |frame36              |
+#---------------------------------------------------------- 
+        $frame1 = $main->Frame(-background => $couleurfond)->pack();
+        $frame2 = $frame1->Frame(-background => $couleurfond)->pack(-side => 'left');
+        $frame3 = $frame1->Frame(-background => $couleurfond)->pack(-side => 'right');
+        $frame4 = $frame2->Frame(-background => $couleurfond)->pack();
+        $canvas = $frame4->Canvas(-width => 500, -height => 300);
+        $frame4->Photo("imagesudoku", -file => $pref . '/photos/sudoku.bmp');
+        $canvas->createImage(250 ,0,-anchor => 'n', -image => "imagesudoku"); 
+        $canvas->pack;
+
+        $frame5 = $frame2->Frame(-background => $couleurfond)->pack();
+        $frame5->Photo('imagenormal', -file => $pref . '/photos/button/' . $langue . '/normal.bmp');
+        $rbutton1= $frame5->Button(-command => [\&CType,'Normal'],
+                        -image => "imagenormal")->pack(-side => 'left');
+        my $balloon1 = $rbutton1->Balloon();
+        $balloon1->attach($rbutton1, -msg => tr1("Grille 9x9 normale"));
+        $frame6 = $frame2->Frame(-background => $couleurfond)->pack();
+        $frame7 = $frame6->Frame(-background => $couleurfond)->pack(-side => 'left');
+        $frame7->Photo('imagesimpliste', -file => $pref . '/photos/button/' . $langue . '/simpliste.bmp');
+        $rbutton2= $frame7->Button(-command => [\&CType,'Simpliste'],
+                        -image => "imagesimpliste")->pack(-side => 'left');
+        my $balloon2 = $rbutton2->Balloon();
+        $balloon2->attach($rbutton2, -msg => tr1("Grille 6x6 facile"));
+        $frame8 = $frame6->Frame(-background => $couleurfond)->pack(-side => 'left');
+        $frame8->Photo('imageardu', -file => $pref . '/photos/button/' . $langue . '/ardu.bmp');
+        $rbutton3= $frame8->Button(-command => [\&CType,'Ardu'],
+                        -image => "imageardu")->pack(-side => 'left');
+        my $balloon3 = $rbutton3->Balloon();
+        $balloon3->attach($rbutton3, -msg => tr1("Grille 8x8 pas facile"));
+        $frame9 = $frame2->Frame(-background => $couleurfond)->pack();
+        $frame9->Photo('imagemaxisudoku', -file => $pref . '/photos/button/' . $langue . '/maxisudoku.bmp');
+        $rbutton4= $frame9->Button(-command => [\&CType,'MaxiSudoku'],
+                        -image => "imagemaxisudoku")->pack(-side => 'left');
+        my $balloon4 = $rbutton4->Balloon();
+        $balloon4->attach($rbutton4, -msg => tr1("Grille 16x16 très difficile"));
+        $frame10 = $frame2->Frame(-background => $couleurfond)->pack();
+        my $frame11 = $frame10->Frame(-background => $couleurfond)->pack(-side => 'left');
+        my $button6 = $frame11->Label(-text => ' ', -background => $couleurfond, 
+                -height => 2, -width => 50)->pack;
+        $frame12 = $frame10->Frame->pack(-side => 'right');
+        $frame12->Photo('imageenfant', -file => $pref . '/photos/button/' . $langue . '/enfant.bmp');
+        $rbutton5 = $frame12->Button(-command => [\&CType,'Enfant'],
+                        -image => "imageenfant")->pack(-side => 'left');
+        my $balloon5 = $rbutton5->Balloon();
+        $balloon5->attach($rbutton5, -msg => tr1("Grille 4x4 très facile\navec dessins d'animaux\npar défaut"));
+        my $frame31 = $frame3->Frame(-height => 3, -background => $couleurfond)->pack();
+        my $frame32 = $frame3->Frame(-background => $couleurfond)->pack();
+        my $frame33 = $frame32->Frame(-background => $couleurfond)->pack(-side => 'left');
+        my $frame34 = $frame32->Frame(-background => $couleurfond)->pack(-side => 'left');
+        my $frame35 = $frame32->Frame(-background => $couleurfond)->pack(-side => 'left');
+        my $canvas3 = $frame34->Canvas('-width' => 5, '-height' => 500, -background => 'black')->pack();
+        my $frame36 = $frame32->Frame(-height => 3, -background => $couleurfond)->pack();
+
+# Left column  -------------------------------
+
+        $frame33->Photo('imageresoudre', -file => $pref . '/photos/button/' . $langue . '/resoudre.bmp');
+        $rbutton10 = $frame33->Button(-command => [\&affichgrille,"R"],
+                        #-text => "Resoudre une grille")->pack();
+                        -image => "imageresoudre")->pack();
+        my $balloon10 = $rbutton10->Balloon();
+        $balloon10->attach($rbutton10, -msg => tr1("Saisir une grille\npour la résoudre"));
+        $frame33->Photo('imagecreer', -file => $pref . '/photos/button/' . $langue . '/creer.bmp');
+        $rbutton12 = $frame33->Button(-command => [\&creation_grille],
+                        #-text => "Creer une grille")->pack();
+                        -image => "imagecreer")->pack(); 
+        my $balloon12 = $rbutton12->Balloon();
+        $balloon12->attach($rbutton12, -msg => tr1("Créer une grille soi même"));
+        $frame33->Photo('imagechiffres', -file => $pref . '/photos/button/' . $langue . '/chiffres.bmp');
+        if ($dessin eq "animaux") {
+                $rbutton13 = $frame33->Button(-command => [sub{$dessin = "chiffres"}],
+                        #-text => "Résoudre avec\ndes chiffres")->pack();
+                        -image => "imagechiffres")->pack();
+        } else {
+                $rbutton13 = $frame33->Label(-background => $couleurfond,
+                        #-text => "Résoudre avec\ndes chiffres")->pack();
+                        -image => "imagechiffres")->pack();
+        }
+        my $balloon13 = $rbutton13->Balloon();
+        $balloon13->attach($rbutton13, -msg => tr1("Il y a des chiffres\n dans les cases"));
+        my $Label5 = $frame33->Label(-text => tr1('Langues'),
+                -font => "Nimbus 20",
+                -background => $couleurfond,
+                -height => 2, -width => 10)->pack;
+        $frame33->Photo('imagefr', -file => $pref . '/photos/button/fr/drapeau.gif');
+        if ($langue ne "fr") {
+                $rbutton14 = $frame33->Button(-command => [\&changelang,"fr"],
+                        #-text => "Français")->pack();
+                        -background => $couleurfond,
+                        -image => "imagefr")->pack(); 
+        } else {
+                $rbutton14 = $frame33->Label(-background => $couleurfond,
+                        #-text => "Français")->pack();
+                        -background => $couleurfond,
+                        -image => "imagefr")->pack(); 
+        }
+        my $balloon14 = $rbutton14->Balloon();
+        $balloon14->attach($rbutton14, -msg => tr1("français"));
+        $frame33->Photo('imagege', -file => $pref . '/photos/button/ge/drapeau.gif'); 
+        if ($langue ne "ge") {
+                $rbutton15 = $frame33->Button(-command => [\&changelang,"ge"],
+                        -background => $couleurfond,
+                        -image => "imagege")->pack(); 
+        } else {
+                $rbutton15 = $frame33->Label(-background => $couleurfond,
+                        -background => $couleurfond,
+                        -image => "imagege")->pack(); 
+        } 
+        my $balloon15 = $rbutton15->Balloon();
+        $balloon15->attach($rbutton15, -msg => tr1("allemand"));
+        $frame33->Photo('imageit', -file => $pref . '/photos/button/it/drapeau.gif'); 
+        if ($langue ne "it") {
+                $rbutton16 = $frame33->Button(-command => [\&changelang,"it"],
+                        -background => $couleurfond,
+                        -image => "imageit")->pack(); 
+        } else {
+                $rbutton16 = $frame33->Label(-background => $couleurfond,
+                        -background => $couleurfond,
+                        -image => "imageit")->pack(); 
+        }
+        my $balloon16 = $rbutton16->Balloon();
+        $balloon16->attach($rbutton16, -msg => tr1("italien"));                     
+
+# Right column ------------------------------
+
+        $frame35->Photo('imagenewgrille', -file => $pref . '/photos/button/' . $langue . '/newgrille.bmp');
+        $rbutton17 = $frame35->Button(-command => [\&affichgrille,"C"],
+                        #-text => "Demander\nune nouvelle grille")->pack();
+                        -image => "imagenewgrille")->pack();
+        my $balloon17 = $rbutton17->Balloon();
+        $balloon17->attach($rbutton17, -msg => tr1("Demander une nouvelle grille"));
+        $frame33->Photo('imageanimaux', -file => $pref . '/photos/button/' . $langue . '/animaux.bmp');
+        my $button18 = $frame35->Label(-text => ' ', -background => $couleurfond,
+                -height => 4, -width => 10)->pack;
+        if ($dessin ne "animaux") {
+                $rbutton19 = $frame35->Button(-command => [sub{$dessin = "animaux"}],
+                        #-text => "Résoudre avec\ndes animaux")->pack();
+                        -image => "imageanimaux")->pack();
+        } else {
+                $rbutton19 = $frame35->Label(
+                        #-text => "Résoudre avec\ndes animaux")->pack();
+                        -image => "imageanimaux")->pack();
+        }
+        my $balloon19 = $rbutton19->Balloon();
+        $balloon19->attach($rbutton19, -msg => tr1("Il y a des animaux\n dans les cases"));
+        my $Label6 = $frame35->Label(-text => ' ', -background => $couleurfond,
+                -height => 4, -width => 10)->pack;
+        $frame35->Photo('imageen', -file => $pref . '/photos/button/en/drapeau.gif');
+        if ($langue ne "en") {
+                $rbutton20 = $frame35->Button(-command => [\&changelang,"en"],
+                        -background => $couleurfond,
+                        #-text => "English")->pack();
+                        -image => "imageen")->pack(); 
+        } else {
+                $rbutton20 = $frame35->Label(
+                        #-text => "English")->pack();
+                        -background => $couleurfond,
+                        -image => "imageen")->pack(); 
+        } 
+        my $balloon20 = $rbutton20->Balloon();
+        $balloon20->attach($rbutton20, -msg => tr1("anglais"));
+        $frame35->Photo('imagesp', -file => $pref . '/photos/button/sp/drapeau.gif');
+        if ($langue ne "sp") {
+                $rbutton21 = $frame35->Button(-command => [\&changelang,"sp"],
+                        -background => $couleurfond,
+                        -image => "imagesp")->pack(); 
+        } else {
+                $rbutton21 = $frame35->Label(
+                        -background => $couleurfond,
+                        -image => "imagesp")->pack(); 
+        }
+        my $balloon21 = $rbutton21->Balloon();
+        $balloon21->attach($rbutton21, -msg => tr1("espagnol")); 
+        $frame35->Photo('imagept', -file => $pref . '/photos/button/pt/drapeau.gif');
+        if ($langue ne "pt") {
+                $rbutton22 = $frame35->Button(-command => [\&changelang,"pt"],
+                        -background => $couleurfond,
+                        -image => "imagept")->pack(); 
+        } else {
+                $rbutton22 = $frame35->Label(
+                        -background => $couleurfond,
+                        -image => "imagept")->pack(); 
+        }
+        my $balloon22 = $rbutton22->Balloon();
+        $balloon22->attach($rbutton22, -msg => tr1("portugais"));
+} else {                  
+        $canvas = $main->Label(-text => 'Sudoku',
+               -height => 4, -width => 10,
+               -font => "Nimbus 80")->pack;
+        $framed = $main->Frame->pack();
+        $canvas1 = $framed->Canvas('-width' => 100,
+               -height => 100);
+        $framed->Photo('image1', -file => $pref . '/photos/20.gif');
+        $canvas1->createImage(0, 0, -anchor => 'nw',
+               -image => image1);
+        $canvas1->pack;
+        $rbutton1= $framed->Radiobutton(-text 
+                               => tr1('Normal'), 
+                              -font => "Nimbus 20",
+                              -value => 1,         # valeur transmise de la variable
+                              -command => [\&CType],
+                              -variable => \$Normal
+                              )->pack(-side => 'left');
+        $rbutton2= $framed->Radiobutton(-text 
+                               => tr1('Simpliste'), 
+                              -font => "Nimbus 20",
+                              -value => 1,       
+                              -command => [\&CType],
+                              -variable => \$Simpliste
+                              )->pack(-side => 'left');
+        $rbutton3= $framed->Radiobutton(-text 
+                               => tr1('Ardu'), 
+                               -font => "Nimbus 20",
+                               -value => 1,       
+                               -command => [\&CType],
+                               -variable => \$Ardu
+                               )->pack(-side => 'left');
+        $rbutton4= $framed->Radiobutton(-text 
+                               => tr1('MaxiSudoku'), 
+                               -font => "Nimbus 20",
+                               -value => 1,
+                               -command => [\&CType],
+                               -variable => \$MaxiSudoku
+                               )->pack(-side => 'left');
+        $rbutton5= $framed->Radiobutton(-text 
+                               => tr1('Enfant'), 
+                               -font => "Nimbus 20",
+                               -value => 1,
+                               -command => [\&CType],
+                               -variable => \$Enfant
+                               )->pack(-side => 'left');
+}
 $wcanvas = 1;
 MainLoop;
 }
@@ -121,7 +341,7 @@ None by default.
 
 =head1 SEE ALSO
 
-Dependance: Tk, IO::File
+Dependance: Tk, Tk::Balloon, IO::File
 
 =head1 AUTHOR
 

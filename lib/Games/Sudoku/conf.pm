@@ -19,6 +19,9 @@ sub conf
 %dessinanimaux = ('1','1.gif','2','2.gif','3','3.gif','4','4.gif','5','5.gif',
         '6','6.gif','7','7.gif','8','8.gif','9','9.gif','A','10.gif',
         'B','11.gif','C','12.gif','D','13.gif','E','14.gif','F','15.gif','G','16.gif');
-$nbsolution = 8;
+$nbsolution = 41;       # how solution have we save for maxisudoku
+$couleurfond = "white"; # color of background
+$fabrication = 0;    # = 1 if we want make many grid 16x16
+$skin = 1;           # = 1 if we want a "beautiful" skin
 }
 1;

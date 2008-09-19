@@ -80,11 +80,7 @@ sub saisie1 {
                                         if ($valeurw eq "G" or $valeurw eq "g") {
                                                 $valeurw = 16;
                                         }
-                                        if (($nbcase == 9 and ($valeurw > 0 and $valeurw < 10))
-                                                or ($nbcase == 16 and 
-                                                        ($valeurw > 0 and $valeurw < 17))
-                                                or ($nbcase == 4 and
-                                                        ($valeurw > 0 and $valeurw < 5))) {
+                                        if ($valeurw > 0 and $valeurw < ($nbcase + 1)) {    # if number is correct    
                                                                 # There is a seizure 
                                                 $erreur_aide = 0;
                                                 if ($aide == 1) {

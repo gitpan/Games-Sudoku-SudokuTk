@@ -16,6 +16,8 @@
 sub newgrille { 
         use Games::Sudoku::sudokuprincipal;
         use Games::Sudoku::affichgrille; 
+        use Games::Sudoku::conf;
+        conf();
         if ($wcanvas == 1) {            # delete Label of beginning
                 $canvas -> destroy;
                 $framed -> destroy;
@@ -54,12 +56,11 @@ sub newgrille {
         $aic = 0;                # init index for "affect"
         $ajc = 0;
         $akc = -1;
-        if ($nbcase == 4) {
-                $cptloop = 500;
-        } elsif ($nbcase == 9) {
-                $cptloop = 500;
-        } else {
+        $affect = 0;
+        if ($nbcase == 16) {
                 $cptloop = 10000;
+        } else {
+                $cptloop = 500;
         }
                 LOOP:while (($fin == 0) and ($cpt < $cptloop) 
                                 and ($toploop < 150)) { #loop for filling the grid
@@ -70,7 +71,8 @@ sub newgrille {
                         $topreplace = 0;
                         if ($wcpt2 > 2000) {
                                 comptageOK();
-                                if (($nbcase != 9 and $nbcase != 4) and $toploop > 1) {   # pour debug à enlever
+                                if (($nbcase != 6 and $nbcase != 8 and $nbcase != 9 and $nbcase != 4) # pour debug à enlever
+                                        and $toploop > 1) {   # pour debug à enlever
                                         $force = 1;          # pour debug à enlever
                                         last;                   # pour debug à enlever
                                 }                               # pour debug à enlever
@@ -250,6 +252,18 @@ sub newgrille {
         exportation();
         affichage_grille('V');
         fin_saisie();
+        if ($nbcase == 16 and $affect == 0) {           # sauvegarde solutions
+                if ($system eq "linux") {
+                        my $t = time;
+                        my @tab = ("cp", "sudoku16.txt", "sudoku16$t.txt");   # sauvegarde
+                        system @tab;
+                        @tab = ("cp", "sudokus16.txt", "sudokus16$t.txt");
+                        system @tab;
+                }
+        }
+        if (defined($fabrication) and $fabrication == 1) {       # sauvegarde solutions
+                newgrille();
+        }
 }
 1;
 
@@ -326,6 +340,7 @@ sub affect {                            # allocation square free since the begin
         if ($aic == ($nbcase)) {
                 print("tout a ete examine \n");
                 $fin = 1;
+                $affect = 1;          # supprimer si pas de recherche solution
         }
 }
 
@@ -348,27 +363,40 @@ sub cherche_case_blanche1 {
 
 sub verifnbcase {
         # Check that in an area the number of squares determined 
-        # + the possible number of squares is equal has nbcase 
+        # + the possible number of squares is equal to nbcase 
         # otherwise restoration
         #print ("verifnbcase\n");
         $wimin = 0;
         $wjmin = 0;
         $restaur = 0;
         if ($nbcase == 9) {
-                $plus = 3;
+                $plusi = 3;
+                $plusj = 3;
         } elsif ($nbcase == 4) {
-                $plus = 2;
+                $plusi = 2;
+                $plusj = 2;
+        } elsif ($nbcase == 6) {
+                $plusi = 2;
+                $plusj = 3;
+        } elsif ($nbcase == 8) {
+                $plusi = 2;
+                $plusj = 4;
         } else {
-                $plus = 4;
+                $plusi = 4;
+                $plusj = 4;
         }
-        for ($ligne = 0; $ligne < $nbcase; $ligne = $ligne + $plus) {
-                for ($colonne = 0; $colonne < $nbcase; $colonne = $colonne + $plus) {
+        for ($ligne = 0; $ligne < $nbcase; $ligne = $ligne + $plusi) {
+                for ($colonne = 0; $colonne < $nbcase; $colonne = $colonne + $plusj) {
                         ($wimin, $wimax, $wjmin, $wjmax) = calminmax($nbcase, $ligne, $colonne);
                         # counting numbers possible squares in an area
                         $wcpt1 = 0;
                         $#area = -1;
                         if ($nbcase == 4) {
                                 @area = (0,0,0,0);
+                        } elsif ($nbcase == 6) {
+                                @area = (0,0,0,0,0,0);
+                        } elsif ($nbcase == 8) {
+                                @area = (0,0,0,0,0,0,0,0);
                         } elsif ($nbcase == 9) {
                                 @area = (0,0,0,0,0,0,0,0,0);
                         } else {

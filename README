@@ -1,4 +1,4 @@
-Games-Sudoku-SudokuTk version 0.10
+Games-Sudoku-SudokuTk version 0.02
 ==================================
 
 The README is used to introduce the module and provide instructions on
@@ -25,7 +25,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Tk, IO::File
+  Tk, Tk::Balloon, IO::File
 
 COPYRIGHT AND LICENCE
 
