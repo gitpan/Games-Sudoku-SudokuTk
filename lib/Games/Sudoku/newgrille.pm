@@ -381,6 +381,12 @@ sub verifnbcase {
         } elsif ($nbcase == 8) {
                 $plusi = 2;
                 $plusj = 4;
+        } elsif ($nbcase == 10) {
+                $plusi = 2;
+                $plusj = 5;
+        } elsif ($nbcase == 12) {
+                $plusi = 3;
+                $plusj = 4;
         } else {
                 $plusi = 4;
                 $plusj = 4;
@@ -399,6 +405,10 @@ sub verifnbcase {
                                 @area = (0,0,0,0,0,0,0,0);
                         } elsif ($nbcase == 9) {
                                 @area = (0,0,0,0,0,0,0,0,0);
+                        } elsif ($nbcase == 10) {
+                                @area = (0,0,0,0,0,0,0,0,0,0);
+                        } elsif ($nbcase == 12) {
+                                @area = (0,0,0,0,0,0,0,0,0,0,0,0);
                         } else {
                                 @area = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
                         }

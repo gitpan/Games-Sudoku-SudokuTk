@@ -28,7 +28,8 @@ sub affichgrille {
                         $frame1 -> destroy;
                 } else {
                         $canvas -> destroy;
-                        $framed -> destroy;
+                        $framed1 -> destroy;
+                        $framed2 -> destroy;
                 }
                 $wcanvas = 0;
         } else {
@@ -36,13 +37,17 @@ sub affichgrille {
         }
         ($fonction) = @_;
         if ($Enfant == 1) {
-                $nbcase = 4;
+                $nbcase = 4; 
         } elsif ($MaxiSudoku == 1) {
                 $nbcase = 16;
         } elsif ($Simpliste == 1) {
                 $nbcase = 6;       
         } elsif ($Ardu == 1) {
                 $nbcase = 8;
+        } elsif ($Difficile == 1) {
+                $nbcase = 10;
+        } elsif ($Tresdifficile == 1) {
+                $nbcase = 12;
         } else  {
                 $nbcase = 9;            # Normal
         }
@@ -100,12 +105,7 @@ sub affichgrille {
 
 sub creation_grille {                   # Posting grid to build a problem
         if ($wcanvas == 1) {
-                #if ($skin == 0) {
-                 #       $canvas -> destroy;
-                  #      $framed -> destroy;
-                #} else {
-                        $frame1->destroy;
-                #}
+                $frame1->destroy;
                 $wcanvas = 0;
         } else {
                 $frame1 -> destroy;
@@ -116,6 +116,10 @@ sub creation_grille {                   # Posting grid to build a problem
                 $nbcase = 6;
         } elsif ($Ardu == 1) {
                 $nbcase = 8;
+        } elsif ($Difficile == 1) {
+                $nbcase = 10;
+        } elsif ($Tresdifficile == 1) {
+                $nbcase = 12;
         } elsif ($MaxiSudoku == 1) {
                 $nbcase = 16;
         } else {
@@ -335,12 +339,13 @@ sub affichage_grille {          # posting grid
 sub affich_case {           # posting a square
         my ($i,$j) = @_;
         #print ("affich_case " . $i . " " . $j . "\n");
-        if ($nbcase == 9 or $nbcase == 4 or $nbcase == 6 or $nbcase == 8) { 
+        if ($nbcase == 9 or $nbcase == 4 or $nbcase == 6 or $nbcase == 8 
+                or $nbcase == 10) { 
                         $width = 2;
                         $taillefont = "30";
                 } else { 
-                        $width = 1;
-                        $taillefont = "20";
+                        $width = 30;
+                        $taillefont = "15";
                 }
         my $trouve = 0;
         for (my $k = 0; $k < $nbcase; $k++) {
@@ -392,7 +397,7 @@ sub affich_case {           # posting a square
                                 }
                         } elsif ($nbcase == 6) {                        # Simpliste
                                 $width = 2;
-                                $taillefont =4;
+                                $taillefont = 4;
                                 if ($k == 0 or $k == 3) {
                                         if ($k == 0) {
                                                 $wwk = 0;
@@ -431,6 +436,34 @@ sub affich_case {           # posting a square
                                         ->Frame(-borderwidth=>1);
                                 $frame7[$wi][$wj][$wwi][$wwj][$wwk]->pack;
                                 }
+                        } elsif ($nbcase == 10) {                        # Difficile
+                                $width = 2;
+                                $taillefont = 4;
+                                if ($k == 0 or $k == 5) {
+                                        if ($k == 0) {
+                                                $wwk = 0;
+                                        } else { 
+                                                $wwk = 1;
+                                        }
+                                $frame7[$wi][$wj][$wwi][$wwj][$wwk] = $frame6[$wi][$wj][$wwi][$wwj]
+                                        ->Frame(-borderwidth=>1);
+                                $frame7[$wi][$wj][$wwi][$wwj][$wwk]->pack;
+                                }
+                        } elsif ($nbcase == 12) {                        # Tresifficile
+                                $width = 1;
+                                $taillefont = 1;
+                                if ($k == 0 or $k == 4 or $k == 8) {
+                                        if ($k == 0) {
+                                                $wwk = 0;
+                                        } elsif ($k == 4) {
+                                                $wwk = 1;
+                                        } else {
+                                                $wwk = 2;
+                                        }
+                                $frame7[$wi][$wj][$wwi][$wwj][$wwk] = $frame6[$wi][$wj][$wwi][$wwj]
+                                        ->Frame(-borderwidth=>1);
+                                $frame7[$wi][$wj][$wwi][$wwj][$wwk]->pack;
+                                }
                         } else {                                        #nbcase = 16 Maxi
                                 $width = 1;
                                 $taillefont = 1;
@@ -458,9 +491,9 @@ sub affich {
         use Games::Sudoku::conf; 
         conf();
         if ($dessin eq "animaux") {
-                if ($nbcase == 16) {
-                        $width1 = 35;
-                        $height1 = 35;
+                if ($nbcase == 10 or $nbcase == 12 or $nbcase == 16) {
+                        $width1 = 30;
+                        $height1 = 30;
                 } else {
                         $width1 = 45;
                         $height1 = 45;
@@ -469,7 +502,12 @@ sub affich {
                         ->Canvas('width' => $width1,-highlightbackground => 'black',
                                 -height => $height1);
                 my $nomdessinanimaux = $dessinanimaux{$wkaffich};
-                my $fichier = $pref . '/photos/' . $nomdessinanimaux;
+                my $fichier;
+                if ($nbcase == 10 or $nbcase == 12 or $nbcase == 16) {
+                        $fichier = $pref . '/photos/p' . $nomdessinanimaux;
+                } else {
+                        $fichier = $pref . '/photos/' . $nomdessinanimaux;
+                }
                 my $image = "image" . $wkaffich;
                 $frame6[$wi][$wj][$wwi][$wwj]
                         ->Photo($image, -file => $fichier);
@@ -477,8 +515,14 @@ sub affich {
                         -image => $image);
                 $entrycarre[$i][$j][$k]->pack;
         } else {
+                if ($nbcase == 10 or $nbcase == 12 or $nbcase == 16) {
+                        $height2 = 1;
+                } else { 
+                        $height2 = 2;
+                }
                 $entrycarre[$i][$j][$k] = $frame6[$wi][$wj][$wwi][$wwj]
-                        ->Entry(-width=>2, -font => "Nimbus " . $taillefont,
+                        ->Entry(-width=> 2,  
+                        -font => "Nimbus " . $taillefont,
                         -background=>$backgroundcouleur)->pack;
                 $entrycarre[$i][$j][$k]->insert(0," " . $wkaffich);
         }             
@@ -511,18 +555,39 @@ sub affichdessin {
         my $textframe3 = $frame3->Label(-text => tr1('Choisissez'), 
                 -font => "Nimbus 20")->pack;
         $frame4 = $frame7->Frame->pack;
+        $frame5 = $frame7->Frame->pack;
         for (my $i = 0; $i < $nbcase; $i++) {             # posting drawings for choice
-                my $nomdessinanimaux = $dessinanimaux{$i + 1};
-                my $fichier = $pref . '/photos/' . $nomdessinanimaux;
+                my $chiffre = convertcase($i + 1);
+                my $nomdessinanimaux = $dessinanimaux{$chiffre};
+                my $fichier;
+                my $height;
+                my $width;
+                if ($nbcase == 10 or $nbcase == 12 or $nbcase == 16) {
+                        $fichier = $pref . '/photos/p' . $nomdessinanimaux;
+                        $width = 35;
+                        $height = 35;
+                } else {
+                        $fichier = $pref . '/photos/' . $nomdessinanimaux;
+                        $width = 45;
+                        $height = 45;
+                }
                 my $image = "image" . ($i + 1);
-                my $im = $frame4->Photo($image, -file => $fichier);
-                my $button = $frame4->Button(-height => 45, -width => 45,
-                        -image => $im,
-                        -command => [\&saisiedessin,$idessin,$jdessin,$i + 1]);
+                my $button;
+                if ($i <= 8) {
+                        my $im = $frame4->Photo($image, -file => $fichier);
+                        $button = $frame4->Button(-height => $height, -width => $width,
+                                -image => $im,
+                                -command => [\&saisiedessin,$idessin,$jdessin,$i + 1]);
+                } else {
+                        $im = $frame5->Photo($image, -file => $fichier);
+                        $button = $frame5->Button(-height => $height, -width => $width,
+                                -image => $im,
+                                -command => [\&saisiedessin,$idessin,$jdessin,$i + 1]);
+                }
                 $button->pack(-side => 'left');
         } 
         fixwidthheight();
-        my $button = $frame4->Button(-height => $height, -width => $width,
+        my $button = $frame5->Button(-height => $height, -width => $width + 4,
                         -text => tr1("annulation"),
                         -command => [\&annuldessin, $idessin, $jdessin, $wi, $wj, $wwi, $wwj]);
                 $button->pack(-side => 'left');
@@ -539,6 +604,7 @@ sub annuldessin {
                 -command => [\&affichdessin,$idessin,$jdessin,$wi,$wj,$wwi,$wwj])
                 ->pack(-side=>'left');
         $frame4->destroy;
+        $frame5->destroy;
         $frame3->destroy;        
 }
 
@@ -571,9 +637,6 @@ sub CType {                         # we choose the type of traitment
                         $Ardu = 0;
                         $rbutton3->destroy;
                 }
-                #if ($Simpliste == 0 and $Ardu == 0) {
-                #               $frame6->destroy;
-                #}
                 if ($trait eq 'MaxiSudoku') {
                         $MaxiSudoku = 1;
                         $rbutton4->destroy;
@@ -590,6 +653,24 @@ sub CType {                         # we choose the type of traitment
                 } else {
                         $Enfant = 0;
                         $rbutton5->destroy;
+                }
+                if ($trait eq 'Difficile') {
+                        $Difficile = 1;
+                        $rbutton6->destroy;
+                        my $Label25 = $frame9->Label(-image => "imagedifficile")
+                        ->pack(-side => 'left');
+                } else {
+                        $Difficile = 0;
+                        $rbutton6->destroy;
+                }
+                if ($trait eq 'Tresdifficile') {
+                        $Tresdifficile = 1;
+                        $rbutton7->destroy;
+                        my $Label26 = $frame9->Label(-image => "imagetresdifficile")
+                        ->pack(-side => 'left');
+                } else {
+                        $Tresdifficile = 0;
+                        $rbutton7->destroy;
                 }
         } else {                                               # Normal skin
                 if ($Normal == 0) {
@@ -614,6 +695,14 @@ sub CType {                         # we choose the type of traitment
                 }
                 if ($Enfant == 1) {
                        $dessin = "animaux";            # option by default
+                }
+                if ($Difficile == 0) {
+                       $rbutton6->destroy;
+                       $Difficile = 2;
+                }
+                if ($tresdifficile == 0) {
+                       $rbutton7->destroy;
+                       $Tresdifficile = 2;
                 }
         }
 }
@@ -640,17 +729,17 @@ sub convertcase {               # Conversion number
 
 sub fixwidthheight {            # determination of $height and $width
         if ($system eq "linux") {
-                                if ($nbcase == 16) {
-                                        $height = 1;
+                                if ($nbcase == 10 or $nbcase == 12 or $nbcase == 16) {
+                                        $height = 35;
                                         $width = 1;
                                 } else {
                                         $height = 2;
                                         $width = 2;
                                 }
                         } else {                        # windows
-                                if ($nbcase == 16) {
-                                        $height = 1;
-                                        $width = 5;
+                                if ($nbcase == 10 or $nbcase == 12 or $nbcase == 16) {
+                                        $height = 2;
+                                        $width = 3;
                                 } else {
                                         $height = 3;
                                         $width = 7;

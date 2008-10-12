@@ -25,7 +25,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 sudoku();
 # Preloaded methods go here.
 
@@ -109,6 +109,11 @@ if ($skin == 1) {
         my $balloon3 = $rbutton3->Balloon();
         $balloon3->attach($rbutton3, -msg => tr1("Grille 8x8 pas facile"));
         $frame9 = $frame2->Frame(-background => $couleurfond)->pack();
+        $frame9->Photo('imagedifficile', -file => $pref . '/photos/button/' . $langue . '/difficile.bmp');
+        $rbutton6= $frame9->Button(-command => [\&CType,'Difficile'],
+                        -image => "imagedifficile")->pack(-side => 'left');
+        my $balloon6 = $rbutton6->Balloon();
+        $balloon6->attach($rbutton6, -msg => tr1("Grille 10x10 difficile"));
         $frame9->Photo('imagemaxisudoku', -file => $pref . '/photos/button/' . $langue . '/maxisudoku.bmp');
         $rbutton4= $frame9->Button(-command => [\&CType,'MaxiSudoku'],
                         -image => "imagemaxisudoku")->pack(-side => 'left');
@@ -119,6 +124,12 @@ if ($skin == 1) {
         my $button6 = $frame11->Label(-text => ' ', -background => $couleurfond, 
                 -height => 2, -width => 50)->pack;
         $frame12 = $frame10->Frame->pack(-side => 'right');
+        $frame12->Photo('imagetresdifficile', -file => $pref . '/photos/button/' . 
+                $langue . '/tresdifficile.bmp');
+        $rbutton7 = $frame12->Button(-command => [\&CType,'Tresdifficile'],
+                        -image => "imagetresdifficile")->pack(-side => 'left');
+        my $balloon7 = $rbutton7->Balloon();
+        $balloon7->attach($rbutton7, -msg => tr1("Grille 12x12 très difficile"));
         $frame12->Photo('imageenfant', -file => $pref . '/photos/button/' . $langue . '/enfant.bmp');
         $rbutton5 = $frame12->Button(-command => [\&CType,'Enfant'],
                         -image => "imageenfant")->pack(-side => 'left');
@@ -263,51 +274,66 @@ if ($skin == 1) {
         }
         my $balloon22 = $rbutton22->Balloon();
         $balloon22->attach($rbutton22, -msg => tr1("portugais"));
-} else {                  
+} else {                                # normal look              
         $canvas = $main->Label(-text => 'Sudoku',
                -height => 4, -width => 10,
                -font => "Nimbus 80")->pack;
-        $framed = $main->Frame->pack();
-        $canvas1 = $framed->Canvas('-width' => 100,
-               -height => 100);
-        $framed->Photo('image1', -file => $pref . '/photos/20.gif');
+        $framed1 = $main->Frame->pack();
+        $framed2 = $main->Frame->pack();
+        $canvas1 = $framed1->Canvas('-width' => 100,
+               -height => 80);
+        $framed1->Photo('image1', -file => $pref . '/photos/20.gif');
         $canvas1->createImage(0, 0, -anchor => 'nw',
                -image => image1);
         $canvas1->pack;
-        $rbutton1= $framed->Radiobutton(-text 
+        $rbutton1= $framed1->Radiobutton(-text 
                                => tr1('Normal'), 
                               -font => "Nimbus 20",
                               -value => 1,         # valeur transmise de la variable
                               -command => [\&CType],
                               -variable => \$Normal
                               )->pack(-side => 'left');
-        $rbutton2= $framed->Radiobutton(-text 
+        $rbutton2= $framed1->Radiobutton(-text 
                                => tr1('Simpliste'), 
                               -font => "Nimbus 20",
                               -value => 1,       
                               -command => [\&CType],
                               -variable => \$Simpliste
                               )->pack(-side => 'left');
-        $rbutton3= $framed->Radiobutton(-text 
+        $rbutton3= $framed1->Radiobutton(-text 
                                => tr1('Ardu'), 
                                -font => "Nimbus 20",
                                -value => 1,       
                                -command => [\&CType],
                                -variable => \$Ardu
                                )->pack(-side => 'left');
-        $rbutton4= $framed->Radiobutton(-text 
+        $rbutton4= $framed2->Radiobutton(-text 
                                => tr1('MaxiSudoku'), 
                                -font => "Nimbus 20",
                                -value => 1,
                                -command => [\&CType],
                                -variable => \$MaxiSudoku
                                )->pack(-side => 'left');
-        $rbutton5= $framed->Radiobutton(-text 
+        $rbutton5= $framed2->Radiobutton(-text 
                                => tr1('Enfant'), 
                                -font => "Nimbus 20",
                                -value => 1,
                                -command => [\&CType],
                                -variable => \$Enfant
+                               )->pack(-side => 'left');
+       $rbutton6= $framed2->Radiobutton(-text 
+                               => tr1('Difficile'), 
+                               -font => "Nimbus 20",
+                               -value => 1,
+                               -command => [\&CType],
+                               -variable => \$Difficile
+                               )->pack(-side => 'left');
+       $rbutton7= $framed2->Radiobutton(-text 
+                               => tr1('Très difficile'), 
+                               -font => "Nimbus 20",
+                               -value => 1,
+                               -command => [\&CType],
+                               -variable => \$Tresdifficile
                                )->pack(-side => 'left');
 }
 $wcanvas = 1;
@@ -341,7 +367,7 @@ None by default.
 
 =head1 SEE ALSO
 
-Dependance: Tk, Tk::Balloon, IO::File
+Dependance: Tk, IO::File
 
 =head1 AUTHOR
 

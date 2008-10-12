@@ -600,6 +600,56 @@ sub calminmax {
                         $wjmin = 6;
                 }
         }
+        if ($nbcase == 10) {                     # Difficile
+                if ($ligne < 2) {
+                        $wimax = 2;
+                        $wimin = 0;
+                } elsif ($ligne < 4) {
+                        $wimax = 4;
+                        $wimin = 2;
+                } elsif ($ligne < 6) {
+                        $wimax = 6;
+                        $wimin = 4;
+                } elsif ($ligne < 8) {
+                        $wimax = 8;
+                        $wimin = 6;
+                } else {
+                        $wimax = 10;
+                        $wimin = 8;
+                }
+                if ($colonne < 5) {
+                        $wjmax = 5;
+                        $wjmin = 0;
+                } else {
+                        $wjmax = 10;
+                        $wjmin = 5;
+                }
+        }
+        if ($nbcase == 12) {                     # Tresdifficile
+                if ($ligne < 3) {
+                        $wimax = 3;
+                        $wimin = 0;
+                } elsif ($ligne < 6) {
+                        $wimax = 6;
+                        $wimin = 3;
+                } elsif ($ligne < 9) {
+                        $wimax = 9;
+                        $wimin = 6;
+                } else {
+                        $wimax = 12;
+                        $wimin = 9;
+                }
+                if ($colonne < 4) {
+                        $wjmax = 4;
+                        $wjmin = 0;
+                } elsif ($colonne < 8) {
+                        $wjmax = 8;
+                        $wjmin = 4;
+                } else {
+                        $wjmax = 12;
+                        $wjmin = 8;
+                }
+        }
         if ($nbcase == 16) {                    # Maxi
                 if ($ligne < 4) {
                         $wimax = 4;
@@ -652,6 +702,21 @@ sub calminmaxred {
         #                                                                        ---- ---- ---- ----
         #                                                                        ---- ---- ---- ----
         #                                                                        ---- ---- ---- ----
+        # Difficile ----- ----- Tresdifficile ---- ---- ----
+        #           ----- -----               ---- ---- ----
+        #                                     ---- ---- ----
+        #           ----- -----
+        #           ----- -----               ---- ---- ----
+        #                                     ---- ---- ----
+        #           ----- -----               ---- ---- ----
+        #           ----- -----    
+        #                                     ---- ---- ----
+        #           ----- -----               ---- ---- ----
+        #           ----- -----               ---- ---- ----
+        #                                   
+        #           ----- -----               ---- ---- ----
+        #           ----- -----               ---- ---- ----
+        #                                     ---- ---- ----
         my $wimax = 0;                  
         my $wjmax = 0;                  
         my $wimax1 = O;                 
@@ -670,6 +735,16 @@ sub calminmaxred {
                 $wimax = 4;
                 $wjmax = 2;
                 $wimax1 = 2;
+                $wjmax1 = 4;
+        } elsif ($nbcase == 10) {       # Difficile
+                $wimax = 5;
+                $wjmax = 2;
+                $wimax1 = 2;
+                $wjmax1 = 5;
+        } elsif ($nbcase == 12) {       # Maxi
+                $wimax = 4;
+                $wjmax = 3;
+                $wimax1 = 3;
                 $wjmax1 = 4;
         } elsif ($nbcase == 16) {       # Maxi
                 $wimax = 4;

@@ -11,4 +11,6 @@ Revision history for Perl extension Games::Sudoku::SudokuTk.
         - version with grids 4x4 => Child, 6x6 => Simplistic, 
                 8x8 => Arduous, 9x9 => Normal and 16x16 Maxi
 		Graphic buttons
-        
+0.12  Sun Oct 12 18:11:00 2008
+	-version with grids 6x6 => Simplistic, 10x10 => Difficult,
+		12x12 => Very difficult        
