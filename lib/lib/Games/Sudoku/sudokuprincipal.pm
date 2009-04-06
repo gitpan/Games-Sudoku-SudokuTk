@@ -397,7 +397,7 @@ sub importation                 #importation data from a file
                         }
                 }
         }
-        $filehandle->close;       
+        $filehandle->close; 
 }
 
 sub sauve

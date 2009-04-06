@@ -47,9 +47,15 @@ sub saisie1 {
                         if ($trouve eq "0") {   # if not found
                                 if ($trait eq "T" or $trait eq "V") { # seizure
                                         #print "saisieaaa $i $j\n";
-                                        if ($dessin ne "animaux") {
+                                        if ($dessin ne "animaux" and $dessin ne "couleurs") {
                                                 my $b = $entrycarre[$i][$j][0]->Entry;
                                                 $valeurw = $entrycarre[$i][$j][0]->get;
+                                                if ($dessin eq "lettres") {
+                                                        # delete spaces beginning and end
+                                                        $valeurw =~ s/^\s+//;
+                                                        #print ("saisie lettre " . $valeurw . "\n");
+                                                        $valeurw = convertchiffre($valeurw);
+                                                }
                                         } else {
                                                 if ($i == $idessin and $j == $jdessin) {
                                                         $valeurw = $valdessin;
@@ -156,3 +162,14 @@ sub saisie1 {
         }
 }
 1;
+
+sub convertchiffre {     # Conversion letter in number
+        my ($lettre, $code) = @_;
+        my %chif = ('A','1','B','2','C','3','D','4','E','5','F','6','G','7','H','8','I','9',
+                'J','10','K','11','L','12','M','13','N','14','O','15','P','16',
+                'a','1','b','2','c','3','d','4','e','5','f','6','g','7','h','8','i','9',
+                'j','10','k','11','l','12','m','13','n','14','o','15','p','16');
+        my $chiffre = $chif{$lettre};
+        #print ("convertchiffre " . $chiffre . " " . $lettre . "\n");
+        return $chiffre;
+}

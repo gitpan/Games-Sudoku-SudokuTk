@@ -13,4 +13,6 @@ Revision history for Perl extension Games::Sudoku::SudokuTk.
 		Graphic buttons
 0.12  Sun Oct 12 18:11:00 2008
 	-version with grids 6x6 => Simplistic, 10x10 => Difficult,
-		12x12 => Very difficult        
+		12x12 => Very difficult 
+0.13  Mon Apr 6 21:31:00 2009
+        -version with color letters and time computer

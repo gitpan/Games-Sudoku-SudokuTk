@@ -23,6 +23,7 @@ sub affichgrille {
         use Games::Sudoku::tr1;
         use Games::Sudoku::conf;
         conf();
+        $timedebut = time;
         if ($wcanvas == 1) {                    # cancellation image beginning 
                 if ($skin == 1) {
                         $frame1 -> destroy;
@@ -57,7 +58,7 @@ sub affichgrille {
                 menu('affichgrille');
         }
         if ($fonction eq "R") {
-                $frame1 = $main->Frame(-width => 750, -height => 500);
+                $frame1 = $main->Frame(-width => 850, -height => 600);
                 $frame1->pack(-side=>'left');
                 my $frame2 = $frame1->Frame;            # Posting Question 
                 $frame2->pack;
@@ -75,7 +76,7 @@ sub affichgrille {
                                 -text=>tr1('OK')
                         )->pack();
         } elsif ($fonction eq "C") {
-                $frame1 = $main->Frame(-width => 750, -height => 600);
+                $frame1 = $main->Frame(-width => 850, -height => 600);
                 $frame1->pack(-side=>'left');
                 my $frame2 = $frame1->Frame;            # Posting Question 
                 $frame2->pack;
@@ -94,7 +95,7 @@ sub affichgrille {
                         )->pack();
         } else {
                 menu('affichgrilleS');
-                $frame1 = $main->Frame(-width => 750, -height => 600);
+                $frame1 = $main->Frame(-width => 850, -height => 600);
                 $frame1->pack(-side=>'left');
                 init_tableau();
                 affichage_grille($fonction);
@@ -135,6 +136,7 @@ sub creation_grille {                   # Posting grid to build a problem
         @frame1 = ' ';
         @carre = 0;
         init_tableau();
+        $timedebut = time;
         affichage_grille($fonction);        
 }
 
@@ -187,11 +189,16 @@ sub affichage_grille {          # posting grid
         ($trait) = @_;
         #print "affichage grille trait= " . $trait . "\n";
         $frame1->destroy;
-        $frame1 = $main->Frame(-width => 750, -height => 600);
+        $frame1 = $main->Frame(-width => 950, -height => 600);
         $frame1->pack;
         $frame2 = $frame1->Frame;
         $frame2->pack;
         $frame7 = $frame2->Frame->pack(-side=>'right');         # posting right side
+        $timefin = time;
+        my ($hh, $mn, $s) = caltime($timefin, $timedebut);
+        my $frame20 = $frame7->Label(-text => tr1('Temps : ') . $hh . tr1('h') . $mn . tr1('mn') . $s . tr1('s') . "\n\n\n",
+                -font => "Nimbus 10"
+                )->pack();
         if ($trait ne "F" or $fin != 1) {
                 if ($fonction ne "S") {
                         if ($trait ne "T" and $trait ne "V") {
@@ -258,6 +265,25 @@ sub affichage_grille {          # posting grid
                                                                         ->Button(-height => 45, -width => 45,
                                                                         -image => $im);
                                                                 $button->pack(-side => 'left');
+                                                        } elsif ($dessin eq "couleurs") {
+                                                                $frame12 = $frame7->Frame;
+                                                                $frame121 = $frame12->Label(-text
+                                                                => tr1('Faux la bonne valeur est '), 
+                                                                -font => "Nimbus 15"
+                                                                )->pack(-side => 'left');
+                                                                my $nomdessincouleurs = 
+                                                                        $dessincouleurs{$affichbonnevaleur};
+                                                                my $button = $frame12
+                                                                        ->Button(-height => 3, -width => 5,
+                                                                        -background => $nomdessincouleurs);
+                                                                $button->pack(-side => 'left');
+                                                        } elsif ($dessin eq "lettres") {
+                                                                $affichbonnevaleur = convertlettre($bonnevaleur);
+                                                                $frame12 = $frame7->Label(-text
+                                                                => tr1('Faux la bonne valeur est ') 
+                                                                . $affichbonnevaleur,
+                                                                -font => "Nimbus 15"
+                                                                )->pack();
                                                         } else {
                                                                 $frame12 = $frame7->Label(-text
                                                                 => tr1('Faux la bonne valeur est ') 
@@ -274,6 +300,14 @@ sub affichage_grille {          # posting grid
                                         }
                                         if ($dessin eq "animaux") {
                                                 $frame8 = $frame7->Label(-text => tr1('Choisir dessin'),
+                                                        -font => "Nimbus 15"
+                                                        )->pack();
+                                        } elsif ($dessin eq "lettres") {
+                                                $frame8 = $frame7->Label(-text => tr1('Saisir lettres'),
+                                                        -font => "Nimbus 15"
+                                                        )->pack();
+                                        } elsif ($dessin eq "couleurs") {
+                                                $frame8 = $frame7->Label(-text => tr1('Choisir couleurs'),
                                                         -font => "Nimbus 15"
                                                         )->pack();
                                         } else {
@@ -371,6 +405,13 @@ sub affich_case {           # posting a square
                         ->Button(-text => ' ', -height => $height, -width => $width,
                         -activebackground => "yellow",
                         -command => [\&affichdessin,$i,$j,$wi,$wj,$wwi,$wwj])
+                        ->pack(-side=>'left');
+                }elsif ($dessin eq "couleurs") {
+                        fixwidthheight();
+                        $entrycarre[$i][$j][0] = $frame6[$wi][$wj][$wwi][$wwj]
+                        ->Button(-text => ' ', -height => $height, -width => $width,
+                        -activebackground => "yellow",
+                        -command => [\&affichcouleurs,$i,$j,$wi,$wj,$wwi,$wwj])
                         ->pack(-side=>'left');
                 } else {
                         $entrycarre[$i][$j][0] = $frame6[$wi][$wj][$wwi][$wwj]
@@ -514,6 +555,17 @@ sub affich {
                 $entrycarre[$i][$j][$k]->createImage(0, 0, -anchor => 'nw',
                         -image => $image);
                 $entrycarre[$i][$j][$k]->pack;
+        } elsif ($dessin eq "couleurs") {
+                if ($nbcase == 10 or $nbcase == 12 or $nbcase == 16) {
+                        $height2 = 1;
+                } else { 
+                        $height2 = 2;
+                }
+                my $couleur = $dessincouleurs{$wkaffich};
+                $entrycarre[$i][$j][$k] = $frame6[$wi][$wj][$wwi][$wwj]
+                        ->Entry(-width=> 2, 
+                        -font => "Nimbus " . $taillefont,
+                        -background=>$couleur)->pack;
         } else {
                 if ($nbcase == 10 or $nbcase == 12 or $nbcase == 16) {
                         $height2 = 1;
@@ -524,7 +576,12 @@ sub affich {
                         ->Entry(-width=> 2,  
                         -font => "Nimbus " . $taillefont,
                         -background=>$backgroundcouleur)->pack;
-                $entrycarre[$i][$j][$k]->insert(0," " . $wkaffich);
+                if ($dessin eq "lettres") {
+                        my $lettre = convertlettre($wkaffich);
+                        $entrycarre[$i][$j][$k]->insert(0," " . $lettre);
+                } else {
+                        $entrycarre[$i][$j][$k]->insert(0," " . $wkaffich);
+                }
         }             
 }
 
@@ -598,14 +655,60 @@ sub annuldessin {
         my ($idessin, $jdessin, $wi, $wj, $wwi, $wwj, $code) = @_;
         fixwidthheight();
         $entrycarre[$idessin][$jdessin][0]->destroy;
-        $entrycarre[$idessin][$jdessin][0] = $frame6[$wi][$wj][$wwi][$wwj]
-                ->Button(-text => ' ', -height => $height, -width => $width,
-                -background => "white",
-                -command => [\&affichdessin,$idessin,$jdessin,$wi,$wj,$wwi,$wwj])
-                ->pack(-side=>'left');
+        if ($dessin eq "animaux") {
+                $entrycarre[$idessin][$jdessin][0] = $frame6[$wi][$wj][$wwi][$wwj]
+                        ->Button(-text => ' ', -height => $height, -width => $width,
+                        -background => "white",
+                        -command => [\&affichdessin,$idessin,$jdessin,$wi,$wj,$wwi,$wwj])
+                        ->pack(-side=>'left');
+        } elsif ($dessin eq "couleurs") {
+                $entrycarre[$idessin][$jdessin][0] = $frame6[$wi][$wj][$wwi][$wwj]
+                        ->Button(-text => ' ', -height => $height, -width => $width,
+                        -background => "white",
+                        -command => [\&affichcouleurs,$idessin,$jdessin,$wi,$wj,$wwi,$wwj])
+                        ->pack(-side=>'left');
+        }
         $frame4->destroy;
         $frame5->destroy;
         $frame3->destroy;        
+}
+
+sub affichcouleurs {
+        my ($idessin, $jdessin, $wi, $wj, $wwi, $wwj, $code) = @_;
+        use Games::Sudoku::conf; 
+        conf();
+        #print "affichcouleur $idessin $jdessin\n";
+        fixwidthheight();
+        $entrycarre[$idessin][$jdessin][0]->destroy;
+        $entrycarre[$idessin][$jdessin][0] = $frame6[$wi][$wj][$wwi][$wwj]
+                        ->Button(-text => ' ', -height => $height, -width => $width,
+                        -background => "yellow")
+                        ->pack(-side=>'left');
+        $frame3 = $frame7->Frame->pack;
+        my $textframe3 = $frame3->Label(-text => tr1('Choisissez'), 
+                -font => "Nimbus 20")->pack;
+        $frame4 = $frame7->Frame->pack;
+        $frame5 = $frame7->Frame->pack;
+        for (my $i = 0; $i < $nbcase; $i++) {             # posting drawings for choice
+                my $chiffre = convertcase($i + 1);
+                my $couleur = $dessincouleurs{$chiffre};
+                my $button;
+                if ($i <= 8) {
+                        $button = $frame4->Button(-height => $height, -width => $width,
+                                -background => $couleur,
+                                -command => [\&saisiedessin,$idessin,$jdessin,$i + 1]);
+                } else {
+                        $button = $frame5->Button(-height => $height, -width => $width,
+                                -background => $couleur,
+                                -command => [\&saisiedessin,$idessin,$jdessin,$i + 1]);
+                }
+                $button->pack(-side => 'left');
+        } 
+        fixwidthheight();
+        my $button = $frame5->Button(-height => $height, -width => $width + 4,
+                        -text => tr1("annulation"),
+                        -command => [\&annuldessin, $idessin, $jdessin, $wi, $wj, $wwi, $wwj]);
+                $button->pack(-side => 'left');        
 }
 
 sub CType {                         # we choose the type of traitment
@@ -730,7 +833,7 @@ sub convertcase {               # Conversion number
 sub fixwidthheight {            # determination of $height and $width
         if ($system eq "linux") {
                                 if ($nbcase == 10 or $nbcase == 12 or $nbcase == 16) {
-                                        $height = 35;
+                                        $height = 1;
                                         $width = 1;
                                 } else {
                                         $height = 2;
@@ -745,4 +848,24 @@ sub fixwidthheight {            # determination of $height and $width
                                         $width = 7;
                                 }
                         }
+}
+
+sub caltime {           # compute time
+        my ($timefin, $timedebut, $code) = @_;
+        #print ("timefin " . $timefin . " timedebut " . $timedebut . "\n");
+        my $dif = $timefin - $timedebut;        
+        my $hh = int($dif / 3600);
+        my $dif1 = $dif - ($hh * 3600);
+        my $mn = int($dif1 / 60);
+        my $s = $dif1 - ($mn * 60);
+        return ($hh, $mn, $s);
+}
+
+sub convertlettre {     # Conversion number in letter
+        my ($chiffre, $code) = @_;
+        my %let = ('1','A','2','B','3','C','4','D','5','E','6','F','7','G','8','H','9','I',
+                '10','J','11','K','12','L','13','M','14','N','15','O','16','P');
+        my $lettre = $let{$chiffre};
+        #print ("convertlettre " . $chiffre . " " . $lettre . "\n");
+        return $lettre;
 }

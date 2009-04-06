@@ -19,6 +19,9 @@ sub conf
 %dessinanimaux = ('1','1.gif','2','2.gif','3','3.gif','4','4.gif','5','5.gif',
         '6','6.gif','7','7.gif','8','8.gif','9','9.gif','A','10.gif',
         'B','11.gif','C','12.gif','D','13.gif','E','14.gif','F','15.gif','G','16.gif');
+%dessincouleurs = ('1','#000000','2','#FF0000','3','#0000FF','4','#FFFF00','5','#FFFFFF',
+        '6','#333333','7','#666666','8','#CCCCCC','9','#00FFFF','A','#999999',
+        'B','#00FF00','C','#FF00FF','D','#FF6600','E','#996600','F','#006600','G','#99FFFF');
 $nbsolution = 41;       # how solution have we save for maxisudoku
 $couleurfond = "white"; # color of background
 $fabrication = 0;    # = 1 if we want make many grid 16x16

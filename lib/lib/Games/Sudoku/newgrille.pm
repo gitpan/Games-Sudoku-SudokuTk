@@ -251,10 +251,11 @@ sub newgrille {
         $traitexport = " ";
         exportation();
         affichage_grille('V');
+        $timedebut = time;
         fin_saisie();
         if ($nbcase == 16 and $affect == 0) {           # sauvegarde solutions
                 if ($system eq "linux") {
-                        my $t = time;
+                        #my $t = time;
                         my @tab = ("cp", "sudoku16.txt", "sudoku16$t.txt");   # sauvegarde
                         system @tab;
                         @tab = ("cp", "sudokus16.txt", "sudokus16$t.txt");

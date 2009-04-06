@@ -96,7 +96,11 @@ sub menu {
         $dessinmenu->radiobutton(-label => tr1('chiffres'),
                 -command => [sub{$dessin = "chiffres"}]);        
         $dessinmenu->radiobutton(-label => tr1('animaux'),
-                -command => [sub{$dessin = "animaux"}]);   
+                -command => [sub{$dessin = "animaux"}]); 
+        $dessinmenu->radiobutton(-label => tr1('lettres'),
+                -command => [sub{$dessin = "lettres"}]);        
+        $dessinmenu->radiobutton(-label => tr1('couleurs'),
+                -command => [sub{$dessin = "couleurs"}]);   
         # Language Menu
         my $languemenu = $menubar->Menubutton(-text => tr1('Langues'));
         $languemenu->pack(
