@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Games-Sudoku-SudokuTk
-version:            0.13
+version:            0.14
 abstract:           Sudoku Game 
 author:
     - Guine <cg@>
